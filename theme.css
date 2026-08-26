@@ -2023,7 +2023,12 @@ body .workspace-split.mod-right-split .workspace-sidedock-vault-profile .clickab
   }
 }
 
-/* ========== Modals / command palette / popovers ========== */
+/* ========== Modals / command palette / popovers ==========
+ * Light: paper shell (matches content card).
+ * Dark: floating panels must paint the same desk surface as the main
+ * content leaf — there is no parent desk under a modal — then go glass
+ * + gilt frame so settings chrome matches the content area.
+ */
 .modal,
 .prompt,
 .suggestion-container,
@@ -2046,15 +2051,102 @@ body .workspace-split.mod-right-split .workspace-sidedock-vault-profile .clickab
   background-color: var(--background-modifier-cover);
 }
 
+/*
+ * Dark floating shells = editor desk (same as .mod-root leaf frame)
+ * with gilt frame tokens shared by side docks / main content card.
+ * Remap Obsidian 1.13+ modal/settings tokens — they paint opaque cards
+ * (.setting-items, .setting-page-titlebar, etc.) via --setting-items-background
+ * and --modal-background, not only --background-primary.
+ */
+.theme-dark .modal,
+.theme-dark .modal.mod-settings,
+.theme-dark .modal.mod-sidebar-layout,
+.theme-dark .modal.mod-community-modal,
+.theme-dark .modal.mod-community-theme,
+.theme-dark .modal.mod-community-plugin,
+.theme-dark .prompt {
+  --background-primary: transparent;
+  --background-primary-alt: transparent;
+  --background-secondary: transparent;
+  --background-secondary-alt: transparent;
+  --modal-background: transparent;
+  --modal-sidebar-background: transparent;
+  --settings-background: transparent;
+  --settings-home-background: transparent;
+  --setting-items-background: transparent;
+  background-color: var(--smartisan-editor-desk-solid);
+  background-image: var(--smartisan-editor-desk-surface);
+  background-size: auto;
+  background-blend-mode: normal;
+  background-attachment: fixed;
+  border: 1px solid var(--smartisan-gilt-frame-border);
+  box-shadow:
+    var(--smartisan-gilt-frame-shadow-stack),
+    var(--shadow-l);
+}
+
+/* Settings / modal chrome: dissolve opaque regions so desk texture shows */
+.theme-dark .modal .modal-content,
+.theme-dark .modal .modal-title,
+.theme-dark .modal .modal-header,
+.theme-dark .modal .modal-close-button,
+.theme-dark .modal .modal-sidebar,
+.theme-dark .modal .vertical-tabs-container,
+.theme-dark .modal .vertical-tab-header,
+.theme-dark .modal .vertical-tab-content-container,
+.theme-dark .modal .vertical-tab-content,
+.theme-dark .modal .horizontal-tab-content,
+.theme-dark .modal .vertical-tab-header-group,
+.theme-dark .modal .vertical-tab-header-group-title,
+.theme-dark .modal .setting-page-titlebar,
+.theme-dark .modal .modal-setting-titlebar,
+.theme-dark .modal .setting-group .setting-group-search,
+.theme-dark .modal .setting-group .setting-items,
+.theme-dark .modal .community-modal-search-results-wrapper,
+.theme-dark .modal .community-modal-search-results-status-content,
+.theme-dark .modal .community-modal-details,
+.theme-dark .modal .community-modal-info {
+  background: transparent;
+  background-color: transparent;
+  background-image: none;
+  box-shadow: none;
+}
+
+.theme-dark .modal .vertical-tab-header {
+  border-right: 1px solid var(--smartisan-gilt-frame-border);
+}
+
+.theme-dark .modal .vertical-tab-nav-item.is-active {
+  background: var(--background-modifier-hover);
+  box-shadow: none;
+}
+
 .prompt-input,
 input[type="text"]:not(.metadata-property-key-input):not(.metadata-input-text):not(.metadata-input-number),
 input[type="search"],
 input[type="number"]:not(.metadata-input-number),
-textarea:not(.metadata-input-longtext),
+textarea:not(.metadata-input-longtext) {
+  border-radius: var(--input-radius);
+  border: 1px solid var(--background-modifier-border);
+  background-color: var(--background-modifier-form-field);
+}
+
+/*
+ * Dropdowns: never use background shorthand — it resets repeat to repeat,
+ * then Obsidian's .theme-dark .dropdown { background-image } (higher
+ * specificity) re-adds only the chevron SVG → tiled <> symbols.
+ * Match input chrome via longhands + official positioning tokens.
+ */
+select,
+.combobox-button,
 .dropdown {
   border-radius: var(--input-radius);
   border: 1px solid var(--background-modifier-border);
-  background: var(--background-modifier-form-field);
+  box-shadow: none;
+  background-color: var(--background-modifier-form-field);
+  background-repeat: no-repeat, repeat;
+  background-position: var(--dropdown-background-position);
+  background-size: var(--dropdown-background-size);
 }
 
 /* Search box: same color as surrounding side panel (not form-field white) */
