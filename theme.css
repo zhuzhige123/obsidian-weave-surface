@@ -1220,11 +1220,9 @@ body .workspace-ribbon.mod-left:before,
     0 4px 14px rgba(61, 50, 41, 0.12);
 }
 
-/* Left dock without vault bar (rare): same bottom as right / main */
-.workspace-split.mod-left-split:not(:has(.workspace-sidedock-vault-profile))
-  .workspace-tab-container {
-  margin-bottom: var(--smartisan-side-paper-bottom-no-vault);
-}
+/* Left dock without vault bar is rare on desktop; default bottom inset
+ * matches the vault-present layout (dock-inset). Prefer not to use
+ * relational parent queries for review lint / performance. */
 
 /* Dark paper blend comes from --smartisan-paper-bg-blend on .theme-dark */
 

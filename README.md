@@ -7,11 +7,12 @@ Weave 官方 Obsidian 主题 · Official Obsidian theme by [Weave](https://githu
 ![light theme](https://github.com/user-attachments/assets/48be5437-3321-48d7-ac23-0d6c290ce6cb)
 
 ![dark theme](https://github.com/user-attachments/assets/c2d01af6-74cc-4351-a83f-b42536fe893e)
+
 # 中文
 
 ## 简介
 
-**Weave Surface** 是一款obsidian主题。整体气质是「文房书桌」：外框是书桌材质，笔记内容落在浮起的纸卡上；深色模式下，侧栏与主内容区使用鎏金描边。
+**Weave Surface** 是 Weave 官方 Obsidian 主题。整体气质是「文房书桌」：外框是书桌材质，笔记内容落在浮起的纸卡上；深色模式下，侧栏与主内容区使用鎏金描边。
 
 ## 特点
 
@@ -88,6 +89,10 @@ Weave 官方 Obsidian 主题 · Official Obsidian theme by [Weave](https://githu
 ## 作者
 
 [Weave](https://github.com/zhuzhige123) · [仓库](https://github.com/zhuzhige123/obsidian-weave-surface)
+
+## 许可
+
+MIT License — 详见仓库根目录 `LICENSE`。
 
 ---
 
@@ -172,3 +177,7 @@ Desk surface switching requires [Style Settings](https://github.com/mgmeyers/obs
 ## Author
 
 [Weave](https://github.com/zhuzhige123) · [Repository](https://github.com/zhuzhige123/obsidian-weave-surface)
+
+## License
+
+MIT License — see `LICENSE` in the repository root.
