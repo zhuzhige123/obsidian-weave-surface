@@ -126,9 +126,24 @@ body {
   --radius-l: 12px;
   --radius-xl: 16px;
   --input-radius: 8px;
-  --tab-radius: 8px;
-  --tab-radius-active: 8px;
-  --tab-curve: 8px;
+  --tab-radius: 3px;
+  --tab-radius-active: 3px;
+  --tab-curve: 3px;
+  --smartisan-tab-header-padding-y: 3px;
+  --smartisan-tab-header-padding-x: 5px;
+  --smartisan-tab-header-padding-active-y: 5px;
+  --smartisan-tab-header-padding-active-x: 8px;
+  /* Active tab · piano-key pressed (light = 蓝墨框, dark = 鎏金框) */
+  --smartisan-ink-blue: #2f4f6f;
+  --smartisan-ink-blue-muted: #3d6278;
+  --smartisan-tab-active-border-width: 1px;
+  --smartisan-tab-active-border: var(--smartisan-ink-blue);
+  --smartisan-tab-active-pressed-bg: rgba(48, 32, 20, 0.26);
+  --smartisan-tab-active-pressed-shadow:
+    inset 0 3px 7px rgba(28, 16, 8, 0.48),
+    inset 0 1px 0 rgba(201, 166, 107, 0.22),
+    inset 0 -1px 0 rgba(255, 248, 236, 0.07);
+  --smartisan-tab-active-border-highlight: rgba(201, 166, 107, 0.35);
   --checkbox-radius: 4px;
 
   /* Global floating paper card (header + body share one sheet) */
@@ -352,7 +367,7 @@ body {
   --tab-text-color-focused-active: var(--smartisan-ink);
   --tab-text-color-focused-active-current: var(--smartisan-ink);
   --tab-text-color-focused-highlighted: var(--smartisan-ink);
-  --tab-outline-color: transparent;
+  --tab-outline-color: var(--smartisan-tab-active-border);
   --tab-divider-color: transparent;
 
   --nav-item-background-hover: rgba(255, 248, 236, 0.12);
@@ -633,8 +648,16 @@ body {
   --tab-text-color-focused-active: #e8dfd0;
   --tab-text-color-focused-active-current: #e8dfd0;
   --tab-text-color-focused-highlighted: #e8dfd0;
-  --tab-outline-color: transparent;
+  --tab-outline-color: var(--smartisan-tab-active-border);
   --tab-divider-color: transparent;
+
+  --smartisan-tab-active-border: var(--smartisan-gilt);
+  --smartisan-tab-active-pressed-bg: rgba(0, 0, 0, 0.42);
+  --smartisan-tab-active-pressed-shadow:
+    inset 0 3px 8px rgba(0, 0, 0, 0.62),
+    inset 0 1px 0 rgba(212, 184, 120, 0.16),
+    inset 0 -1px 0 rgba(232, 208, 160, 0.1);
+  --smartisan-tab-active-border-highlight: rgba(232, 208, 160, 0.28);
 
   --nav-item-background-hover: rgba(255, 248, 236, 0.08);
   --nav-item-background-active: rgba(255, 248, 236, 0.14);
@@ -1113,10 +1136,10 @@ body .workspace-ribbon.mod-left:before,
 .workspace-tabs.mod-top > .workspace-tab-header-container .clickable-icon:hover,
 .workspace-tabs.mod-top > .workspace-tab-header-container .view-action,
 .workspace-tabs.mod-top > .workspace-tab-header-container .view-action:hover,
-.workspace-split.mod-left-split .workspace-tabs.mod-top .workspace-tab-header,
-.workspace-split.mod-left-split .workspace-tabs.mod-top .workspace-tab-header:hover,
-.workspace-split.mod-right-split .workspace-tabs.mod-top .workspace-tab-header,
-.workspace-split.mod-right-split .workspace-tabs.mod-top .workspace-tab-header:hover,
+.workspace-split.mod-left-split .workspace-tabs.mod-top .workspace-tab-header:not(.is-active),
+.workspace-split.mod-left-split .workspace-tabs.mod-top .workspace-tab-header:not(.is-active):hover,
+.workspace-split.mod-right-split .workspace-tabs.mod-top .workspace-tab-header:not(.is-active),
+.workspace-split.mod-right-split .workspace-tabs.mod-top .workspace-tab-header:not(.is-active):hover,
 .workspace-split.mod-left-split .workspace-sidedock-vault-profile .clickable-icon,
 .workspace-split.mod-left-split .workspace-sidedock-vault-profile .clickable-icon:hover,
 .workspace-split.mod-right-split .workspace-sidedock-vault-profile .clickable-icon,
@@ -1292,17 +1315,24 @@ body .workspace-ribbon.mod-left:before,
 }
 
 /*
- * Tab bar: rounded headers on wood; active matches desk (transparent).
+ * Tab bar: rounded headers on wood; active tab sinks like a piano key.
  */
 .workspace-tab-header {
   position: relative;
   margin: 2px 2px 0;
+  padding: var(--smartisan-tab-header-padding-y) var(--smartisan-tab-header-padding-x);
+  box-sizing: border-box;
   border-radius: var(--tab-radius) !important;
   border: none;
   overflow: visible !important;
   background: transparent !important;
   background-color: transparent !important;
   box-shadow: none !important;
+  transition:
+    margin-top 0.12s ease,
+    box-shadow 0.12s ease,
+    background-color 0.12s ease,
+    border-color 0.12s ease;
 }
 
 .workspace-tab-header-inner {
@@ -1316,10 +1346,53 @@ body .workspace-ribbon.mod-left:before,
 .workspace-tab-header.is-active,
 .workspace-tab-header.is-active .workspace-tab-header-inner {
   border-radius: var(--tab-radius-active) !important;
-  background: transparent !important;
-  background-color: transparent !important;
   background-image: none !important;
-  box-shadow: none !important;
+}
+
+.workspace-tab-header.is-active {
+  margin-top: 3px;
+  margin-bottom: -1px;
+  padding: var(--smartisan-tab-header-padding-active-y) var(--smartisan-tab-header-padding-active-x);
+  border: var(--smartisan-tab-active-border-width) solid var(--smartisan-tab-active-border) !important;
+  border-top-color: color-mix(in srgb, var(--smartisan-tab-active-border) 55%, #000) !important;
+  border-bottom-color: color-mix(in srgb, var(--smartisan-tab-active-border) 75%, var(--smartisan-tab-active-border-highlight)) !important;
+  background-color: var(--smartisan-tab-active-pressed-bg) !important;
+  box-shadow: var(--smartisan-tab-active-pressed-shadow) !important;
+}
+
+.workspace-tab-header.is-active .workspace-tab-header-inner {
+  background-color: transparent !important;
+  padding-inline: 2px;
+}
+
+.theme-light .workspace-tab-header.is-active {
+  --tab-text-color-active: var(--smartisan-ink-blue);
+}
+
+.theme-dark .workspace-tab-header.is-active {
+  --tab-text-color-active: var(--smartisan-gilt-bright);
+}
+
+/* Side dock tab strips (file tree / tags / …): same piano-key pressed state */
+.workspace-split.mod-left-split .workspace-tabs.mod-top .workspace-tab-header.is-active,
+.workspace-split.mod-right-split .workspace-tabs.mod-top .workspace-tab-header.is-active {
+  margin-top: 3px;
+  margin-bottom: -1px;
+  border: var(--smartisan-tab-active-border-width) solid var(--smartisan-tab-active-border) !important;
+  border-top-color: color-mix(in srgb, var(--smartisan-tab-active-border) 55%, #000) !important;
+  border-bottom-color: color-mix(in srgb, var(--smartisan-tab-active-border) 75%, var(--smartisan-tab-active-border-highlight)) !important;
+  background-color: var(--smartisan-tab-active-pressed-bg) !important;
+  box-shadow: var(--smartisan-tab-active-pressed-shadow) !important;
+}
+
+.theme-light .workspace-split.mod-left-split .workspace-tabs.mod-top .workspace-tab-header.is-active,
+.theme-light .workspace-split.mod-right-split .workspace-tabs.mod-top .workspace-tab-header.is-active {
+  --tab-text-color-active: var(--smartisan-ink-blue);
+}
+
+.theme-dark .workspace-split.mod-left-split .workspace-tabs.mod-top .workspace-tab-header.is-active,
+.theme-dark .workspace-split.mod-right-split .workspace-tabs.mod-top .workspace-tab-header.is-active {
+  --tab-text-color-active: var(--smartisan-gilt-bright);
 }
 
 /* Hide Obsidian folder-tab tail curves */
@@ -1331,12 +1404,21 @@ body .workspace-ribbon.mod-left:before,
   height: 0 !important;
 }
 
-/* Force transparent tab chip (Obsidian may paint inner from --tab-background-active) */
+/* Force transparent tab chip — except active pressed key (main + side docks) */
 .mod-root .workspace-tabs.mod-top .workspace-tab-header,
-.mod-root .workspace-tabs.mod-top .workspace-tab-header.is-active,
-.mod-root .workspace-tabs.mod-top .workspace-tab-header.is-active .workspace-tab-header-inner {
+.mod-root .workspace-tabs.mod-top .workspace-tab-header .workspace-tab-header-inner,
+.workspace-split.mod-left-split .workspace-tabs.mod-top .workspace-tab-header,
+.workspace-split.mod-left-split .workspace-tabs.mod-top .workspace-tab-header .workspace-tab-header-inner,
+.workspace-split.mod-right-split .workspace-tabs.mod-top .workspace-tab-header,
+.workspace-split.mod-right-split .workspace-tabs.mod-top .workspace-tab-header .workspace-tab-header-inner {
   --tab-background-active: transparent;
   background-color: transparent !important;
+}
+
+.mod-root .workspace-tabs.mod-top .workspace-tab-header.is-active,
+.workspace-split.mod-left-split .workspace-tabs.mod-top .workspace-tab-header.is-active,
+.workspace-split.mod-right-split .workspace-tabs.mod-top .workspace-tab-header.is-active {
+  background-color: var(--smartisan-tab-active-pressed-bg) !important;
 }
 
 /* ========== Side panels ========== */
