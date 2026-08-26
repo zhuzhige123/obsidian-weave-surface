@@ -1,6 +1,9 @@
 # Weave Surface
 
 Weave 官方 Obsidian 主题（文房书桌风格）。
+![light theme](https://github.com/user-attachments/assets/48be5437-3321-48d7-ac23-0d6c290ce6cb)
+
+![dark theme](https://github.com/user-attachments/assets/c2d01af6-74cc-4351-a83f-b42536fe893e)
 
 ## 特点
 
