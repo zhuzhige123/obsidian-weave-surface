@@ -386,7 +386,8 @@ body {
   --graph-node-unresolved: #d9c7a5;
   --graph-node-tag: #a8b88a;
   --graph-node-attachment: #b8a898;
-  --graph-text: var(--smartisan-ink-muted);
+  /* Walnut desk: warm paper cream (ink-muted fails contrast on brown) */
+  --graph-text: #faf6ee;
 
   --canvas-background: var(--smartisan-paper-fill);
   --canvas-dot-pattern: rgba(92, 64, 51, 0.16);
@@ -508,6 +509,17 @@ body {
   --smartisan-paper-bg-blend: multiply, soft-light, normal;
   /* Solid chrome color matches content-area desk frame */
   --smartisan-ribbon-color: var(--smartisan-editor-desk-solid);
+  /* Light paper gilt line — softer than dark lacquer frame */
+  --smartisan-gilt-frame-border: rgba(166, 124, 82, 0.62);
+  --smartisan-gilt-frame-outer: rgba(201, 166, 107, 0.28);
+  --smartisan-gilt-frame-highlight: rgba(232, 208, 160, 0.42);
+  --smartisan-gilt-frame-shadow: rgba(92, 64, 51, 0.12);
+  --smartisan-gilt-frame-glow: rgba(201, 166, 107, 0.1);
+  --smartisan-gilt-frame-shadow-stack:
+    0 0 0 1px var(--smartisan-gilt-frame-outer),
+    inset 0 1px 0 var(--smartisan-gilt-frame-highlight),
+    inset 0 -1px 0 var(--smartisan-gilt-frame-shadow),
+    0 0 10px var(--smartisan-gilt-frame-glow);
 }
 
 /* ========== Dark scheme ========== */
@@ -655,7 +667,8 @@ body {
   --graph-node-unresolved: #5a5047;
   --graph-node-tag: #7a8a68;
   --graph-node-attachment: #8a7a68;
-  --graph-text: #c4b8a8;
+  /* Lacquer desk: gilt labels — same family as dark chrome text */
+  --graph-text: var(--smartisan-gilt);
 
   --canvas-background: var(--smartisan-paper-fill);
   --canvas-dot-pattern: rgba(232, 223, 208, 0.12);
@@ -1591,12 +1604,15 @@ body .workspace-split.mod-right-split .workspace-sidedock-vault-profile .clickab
   background: transparent;
 }
 
-/* Search / filter bar: container only — input styled after form-field rules below */
+/* Search / filter bar: container only — input styled after form-field rules below.
+ * Do not pad the container: Obsidian centers ::before via --input-height from
+ * the container top; inner padding shifts the input without moving the icon. */
 .search-input-container {
   background: transparent;
   border: none;
   box-shadow: none;
-  padding: 4px 8px;
+  padding: 0;
+  margin: 4px 8px;
 }
 
 /* ========== Side panel lists (file explorer, tags, outline, bookmarks, search) ========== */
@@ -1661,7 +1677,7 @@ body .workspace-split.mod-right-split .workspace-sidedock-vault-profile .clickab
  * so the card never overflows and "sticks out" on the right.
  * Header + .view-content paint the SAME paper with fixed attachment.
  * Bottom radius + overflow:hidden on .view-content clips plugin hosts.
- * Graph: wood desk only. Canvas uses the same paper card as markdown.
+ * Graph: seamless editor desk (same surface as window frame — no paper card).
  */
 .mod-root .workspace-leaf-content {
   background-color: var(--smartisan-editor-desk-solid);
@@ -1759,7 +1775,7 @@ body .workspace-split.mod-right-split .workspace-sidedock-vault-profile .clickab
 
 /*
  * Dark mode main content card: same gilt frame + transparent shell as side docks.
- * Header + content share one frame; graph stays wood-only.
+ * Header + content share one frame; graph stays on editor desk (no extra wood layer).
  */
 .theme-dark
   .mod-root
@@ -2064,7 +2080,9 @@ body .workspace-split.mod-right-split .workspace-sidedock-vault-profile .clickab
 .theme-dark .modal.mod-community-modal,
 .theme-dark .modal.mod-community-theme,
 .theme-dark .modal.mod-community-plugin,
-.theme-dark .prompt {
+.theme-dark .prompt,
+.theme-dark .suggestion-container,
+.theme-dark .cm-tooltip.cm-tooltip-autocomplete {
   --background-primary: transparent;
   --background-primary-alt: transparent;
   --background-secondary: transparent;
@@ -2149,14 +2167,95 @@ select,
   background-size: var(--dropdown-background-size);
 }
 
-/* Search box: same color as surrounding side panel (not form-field white) */
-.search-input-container input,
+/* Search box: side panel / search view only — not combobox/suggestion popups */
+.workspace-leaf-content[data-type="search"] .search-input-container input,
 .workspace-leaf-content[data-type="search"] input,
-.workspace-leaf-content[data-type="search"] .search-input-container input {
+.nav-header .search-input-container input {
   background-color: var(--background-secondary);
   background-image: none;
   border-color: var(--background-modifier-border);
   box-shadow: none;
+}
+
+/*
+ * Suggest / combobox / command palette: search row = same surface as the list.
+ * Remap form-field tokens on the shell so Obsidian's input { background: var(--background-modifier-form-field) }
+ * resolves to transparent for every descendant (beats generic input[type=text/search] :not() specificity).
+ * !important mirrors metadata-container — needed for hover/focus longhands in app.css.
+ */
+.suggestion-container,
+.suggestion-container.combobox,
+.combobox.suggestion-container,
+.prompt {
+  --background-modifier-form-field: transparent;
+  --background-modifier-form-field-hover: transparent;
+  --interactive-normal: transparent;
+  --interactive-hover: transparent;
+}
+
+.suggestion-container .search-input-container,
+.combobox .search-input-container,
+.combobox.suggestion-container .search-input-container,
+.prompt-input-container {
+  background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  /* Gilt line frame — same language as dark desk / content card */
+  border: 1px solid var(--smartisan-gilt-frame-border) !important;
+  border-radius: var(--input-radius);
+  box-shadow:
+    0 0 0 1px var(--smartisan-gilt-frame-outer),
+    inset 0 1px 0 var(--smartisan-gilt-frame-highlight) !important;
+  /* Inset from suggestion shell — top/sides breathe; bottom stays close to list */
+  margin: 10px 12px 6px !important;
+  padding: 0;
+  box-sizing: border-box;
+  width: auto;
+  align-self: stretch;
+}
+
+.suggestion-container .search-input-container input,
+.suggestion-container .search-input-container input[type="search"],
+.suggestion-container .search-input-container input[type="text"],
+.combobox .search-input-container input,
+.combobox .search-input-container input[type="search"],
+.combobox .search-input-container input[type="text"],
+.combobox.suggestion-container .search-input-container input,
+.combobox.suggestion-container .search-input-container input[type="search"],
+.prompt-input-container input.prompt-input,
+input.prompt-input {
+  background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  border: none !important;
+  border-bottom: none !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+@media (hover: hover) {
+  .suggestion-container .search-input-container input:hover,
+  .combobox .search-input-container input:hover,
+  .prompt-input-container input.prompt-input:hover,
+  input.prompt-input:hover {
+    background: transparent !important;
+    background-color: transparent !important;
+    box-shadow: none !important;
+  }
+}
+
+.suggestion-container .search-input-container input:focus,
+.suggestion-container .search-input-container input:focus-visible,
+.combobox .search-input-container input:focus,
+.combobox .search-input-container input:focus-visible,
+.prompt-input-container input.prompt-input:focus,
+.prompt-input-container input.prompt-input:focus-visible,
+input.prompt-input:focus,
+input.prompt-input:focus-visible {
+  background: transparent !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+  outline: none !important;
 }
 
 /* Properties YAML: never inherit modal form-field chip (default/hover/focus) */
@@ -2238,11 +2337,95 @@ select,
   color: var(--text-muted);
 }
 
-/* ========== Graph (wood desk) ========== */
+/* ========== Graph — seamless editor desk (matches window frame) ==========
+ * Header must beat Obsidian .is-focused .workspace-leaf.mod-active .view-header
+ * (--file-header-background = paper primary). Content stays transparent so the
+ * leaf desk is a single continuous surface (no second wood/card layer).
+ */
+.workspace-leaf-content[data-type="graph"] .view-header,
+.workspace-leaf-content[data-type="localgraph"] .view-header,
+.is-focused
+  .workspace-leaf.mod-active
+  .workspace-leaf-content[data-type="graph"]
+  .view-header,
+.is-focused
+  .workspace-leaf.mod-active
+  .workspace-leaf-content[data-type="localgraph"]
+  .view-header {
+  --file-header-background: var(--smartisan-editor-desk-solid);
+  --file-header-background-focused: var(--smartisan-editor-desk-solid);
+  background-color: var(--smartisan-editor-desk-solid);
+  background-image: var(--smartisan-editor-desk-surface);
+  background-blend-mode: normal;
+  background-size: auto, auto, auto;
+  background-repeat: repeat;
+  background-attachment: fixed;
+  border: none;
+  border-bottom: none;
+  box-shadow: none;
+}
+
+.theme-light
+  .workspace-leaf-content[data-type="graph"]
+  .view-header,
+.theme-light
+  .workspace-leaf-content[data-type="localgraph"]
+  .view-header {
+  color: var(--smartisan-ink);
+  --text-normal: var(--smartisan-ink);
+  --text-muted: var(--smartisan-ink-muted);
+  --text-faint: var(--smartisan-ink-faint);
+  --icon-color: var(--smartisan-ink-muted);
+  --icon-color-hover: var(--smartisan-ink);
+  --icon-color-focused: var(--smartisan-ink);
+  --icon-color-active: var(--smartisan-ink);
+}
+
+.theme-dark
+  .workspace-leaf-content[data-type="graph"]
+  .view-header,
+.theme-dark
+  .workspace-leaf-content[data-type="localgraph"]
+  .view-header {
+  color: var(--smartisan-gilt);
+  --text-normal: var(--smartisan-gilt);
+  --text-muted: var(--smartisan-gilt-muted);
+  --text-faint: var(--smartisan-gilt-muted);
+  --icon-color: var(--smartisan-gilt);
+  --icon-color-hover: var(--smartisan-gilt-bright);
+  --icon-color-focused: var(--smartisan-gilt-bright);
+  --icon-color-active: var(--smartisan-gilt-bright);
+}
+
 .workspace-leaf-content[data-type="graph"] .view-content,
 .workspace-leaf-content[data-type="localgraph"] .view-content {
-  background: var(--smartisan-wood-bg);
-  background-attachment: fixed;
+  background: transparent;
+  background-color: transparent;
+  background-image: none;
+  border: none;
+  box-shadow: none;
+}
+
+.workspace-leaf-content[data-type="graph"] .view-header-title-container,
+.workspace-leaf-content[data-type="localgraph"] .view-header-title-container,
+.workspace-leaf-content[data-type="graph"] .view-header-nav-buttons,
+.workspace-leaf-content[data-type="localgraph"] .view-header-nav-buttons,
+.workspace-leaf-content[data-type="graph"] .view-header-title-parent,
+.workspace-leaf-content[data-type="localgraph"] .view-header-title-parent,
+.workspace-leaf-content[data-type="graph"] .view-header-title-wrapper,
+.workspace-leaf-content[data-type="localgraph"] .view-header-title-wrapper,
+.workspace-leaf-content[data-type="graph"] .view-header-breadcrumb,
+.workspace-leaf-content[data-type="localgraph"] .view-header-breadcrumb {
+  background: transparent;
+  background-image: none;
+  box-shadow: none;
+}
+
+/* Main editor graph: top header arc — clip the shared desk, no inset card */
+.mod-root .workspace-leaf-content[data-type="graph"] .view-header,
+.mod-root .workspace-leaf-content[data-type="localgraph"] .view-header {
+  border-radius: var(--smartisan-paper-radius) var(--smartisan-paper-radius) 0 0;
+  overflow: hidden;
 }
 
 /*
