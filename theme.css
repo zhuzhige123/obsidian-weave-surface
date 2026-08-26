@@ -1,0 +1,3227 @@
+/*
+ * Weave Surface — Weave official Obsidian theme (文房书桌)
+ * Desk surface + paper card chrome; gilt frames in dark mode.
+ * Follows Obsidian CSS variable conventions (.theme-light / .theme-dark / body / :root).
+ *
+ * Desk textures: built into theme.css (body.smartisan-desk-*).
+ * Install default — light: walnut, dark: lacquer (no Style Settings class).
+ * Override in Settings → Style Settings → Weave Surface → 桌面材质.
+ */
+
+/* @settings
+
+name: Weave Surface
+id: weave-surface
+settings:
+    -
+        id: smartisan-desk-heading
+        title: 桌面纹理
+        description: 书桌与外框背景材质。需安装社区插件「Style Settings」后，在 设置 → Style Settings → Weave Surface 中选择。
+        type: heading
+        level: 2
+        collapsed: false
+    -
+        id: smartisan-desk-surface
+        title: 桌面材质
+        description: 不选择时跟随主题默认（浅色胡桃木 / 深色漆器乌木）。选定后将固定为同一种材质（深浅色相同）。
+        type: class-select
+        allowEmpty: true
+        default: none
+        options:
+            -
+                label: 橡木
+                value: smartisan-desk-oak
+            -
+                label: 胡桃木
+                value: smartisan-desk-walnut
+            -
+                label: 枫木
+                value: smartisan-desk-maple
+            -
+                label: 竖纹橡木
+                value: smartisan-desk-oak-vertical
+            -
+                label: 漆器乌木
+                value: smartisan-desk-lacquer
+            -
+                label: 皮革桌垫
+                value: smartisan-desk-leather
+            -
+                label: 竹席
+                value: smartisan-desk-bamboo
+            -
+                label: 毛毡书写垫
+                value: smartisan-desk-felt
+            -
+                label: 软木板
+                value: smartisan-desk-cork
+
+*/
+
+/* ========== Shared tokens ========== */
+body {
+  --smartisan-wood-light: #c4a574;
+  --smartisan-wood-mid: #a67c52;
+  --smartisan-wood-dark: #5c4033;
+  /* Aged stationery — warmer / less bright than pure cream */
+  --smartisan-paper-cream: #e4d6c0;
+  --smartisan-paper-warm: #d9c9ae;
+  --smartisan-paper-line: #cbb89a;
+  --smartisan-margin-red: #c99898;
+  --smartisan-ink: #3d3229;
+  --smartisan-ink-muted: #6b5f54;
+  --smartisan-ink-faint: #8a8075;
+  --smartisan-accent: #c9a66b;
+  --smartisan-accent-hover: #a67c52;
+  --smartisan-gilt: #d4b878;
+  --smartisan-gilt-bright: #e8d0a0;
+  --smartisan-gilt-muted: #c9a66b;
+  --smartisan-shadow: rgba(61, 50, 41, 0.16);
+  --smartisan-shadow-soft: rgba(61, 50, 41, 0.09);
+  /* Shared inset: main paper bottom ↔ side-dock tab paper bottom */
+  --smartisan-dock-inset: 8px;
+  --smartisan-vault-profile-height: 48px;
+
+  /* Coarse wood grain — elongated fibers rotated ~32° (diagonal desk planks) */
+  --smartisan-wood-texture: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='280' height='280'%3E%3Cdefs%3E%3Cfilter id='w'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85 0.035' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.32 0 0 0 0 0.2 0 0 0 0 0.1 0 0 0 0.45 0'/%3E%3C/filter%3E%3C/defs%3E%3Cg transform='rotate(32 140 140)'%3E%3Crect x='-90' y='-90' width='460' height='460' filter='url(%23w)' opacity='0.72'/%3E%3C/g%3E%3C/svg%3E");
+  --smartisan-wood-grain-angle: 32deg;
+
+  /* Paper / suede: fine nap + fiber grit (content-area surfaces) */
+  --smartisan-paper-suede-texture: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='s'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.15' numOctaves='5' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.3 0 0 0 0 0.22 0 0 0 0 0.12 0 0 0 0.42 0'/%3E%3C/filter%3E%3Cfilter id='v'%3E%3CfeTurbulence type='turbulence' baseFrequency='0.06 2.8' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.26 0 0 0 0 0.19 0 0 0 0 0.1 0 0 0 0.3 0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23s)' opacity='0.62'/%3E%3Crect width='160' height='160' filter='url(%23v)' opacity='0.45'/%3E%3C/svg%3E");
+  --smartisan-paper-texture: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.72' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.28 0 0 0 0 0.2 0 0 0 0 0.1 0 0 0 0.62 0'/%3E%3C/filter%3E%3Cfilter id='f'%3E%3CfeTurbulence type='turbulence' baseFrequency='0.035 1.1' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.34 0 0 0 0 0.24 0 0 0 0 0.12 0 0 0 0.28 0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23p)' opacity='0.58'/%3E%3Crect width='200' height='200' filter='url(%23f)' opacity='0.38'/%3E%3C/svg%3E");
+
+  --smartisan-paper-surface:
+    var(--smartisan-paper-suede-texture),
+    var(--smartisan-paper-texture),
+    linear-gradient(180deg, rgba(255, 248, 236, 0.18) 0%, transparent 42%, rgba(92, 64, 51, 0.06) 100%);
+  --smartisan-paper-bg-size: 150px 150px, 200px 200px, 100% 100%;
+  --smartisan-paper-bg-blend: multiply, soft-light, normal;
+  /* Explicit fill for paper shells (do not paint via --background-primary after remap) */
+  --smartisan-paper-fill: var(--smartisan-paper-cream);
+  /* Canvas cards: opaque sheet on paper workspace (not transparent glass) */
+  --smartisan-canvas-card-fill: #faf6ee;
+  /* Iron-gall fountain-pen ink (RGB triplet for rgb(var(--canvas-color))) */
+  --smartisan-canvas-ink: 61, 50, 41;
+  --smartisan-canvas-default-border: var(--smartisan-canvas-ink);
+  --smartisan-canvas-ink-width: 2.75px;
+  --smartisan-canvas-ink-width-focus: 4.5px;
+  /* Card outline — same pen, soft sticky-note corners (visibly inked) */
+  --smartisan-canvas-card-radius: 9px 14px 10px 13px;
+  --smartisan-canvas-card-radius-inner: 7px 11px 8px 10px;
+  --smartisan-canvas-card-border: 2.75px;
+  --smartisan-canvas-card-border-focus: 3.25px;
+
+  --font-text-theme: "Source Han Serif SC", "Noto Serif SC", "Songti SC", "STSong", Georgia, serif;
+  --font-editor-theme: var(--font-text-theme);
+  --font-interface-theme: "Source Han Sans SC", "PingFang SC", "Microsoft YaHei UI", "Segoe UI", sans-serif;
+  --font-monospace-theme: "JetBrains Mono", "Cascadia Code", Consolas, monospace;
+
+  --font-text-size: 16px;
+  --line-height-normal: 1.8;
+  --line-height-tight: 1.45;
+  --smartisan-paper-rule: calc(var(--font-text-size) * var(--line-height-normal));
+
+  --radius-s: 4px;
+  --radius-m: 8px;
+  --radius-l: 12px;
+  --radius-xl: 16px;
+  --input-radius: 8px;
+  --tab-radius: 8px;
+  --tab-radius-active: 8px;
+  --tab-curve: 8px;
+  --checkbox-radius: 4px;
+
+  /* Global floating paper card (header + body share one sheet) */
+  --smartisan-paper-radius: var(--radius-l);
+  --smartisan-paper-top-inset: var(--smartisan-dock-inset);
+  --smartisan-paper-inline-inset: calc(var(--smartisan-dock-inset) * 2.5);
+  --smartisan-paper-bottom-inset: calc(
+    var(--smartisan-vault-profile-height) + var(--smartisan-dock-inset) * 2
+  );
+  /* Side dock without vault bar (usually right): tab paper stops here */
+  --smartisan-side-paper-bottom-no-vault: var(--smartisan-paper-bottom-inset);
+  --smartisan-paper-lift-shadow:
+    0 14px 36px rgba(30, 20, 12, 0.28),
+    0 4px 10px rgba(30, 20, 12, 0.16);
+
+  /* Hot-stamp icon tokens (ribbon + top chrome) */
+  --smartisan-stamp-light-color: #5c4033;
+  --smartisan-stamp-light-color-hover: #3d3229;
+  --smartisan-stamp-light-filter:
+    drop-shadow(0 1px 0 rgba(255, 248, 236, 0.5))
+    drop-shadow(0 -1px 0 rgba(61, 50, 41, 0.4))
+    drop-shadow(0 1px 1.5px rgba(61, 50, 41, 0.28));
+  --smartisan-stamp-light-filter-hover:
+    drop-shadow(0 1px 0 rgba(255, 248, 236, 0.55))
+    drop-shadow(0 -1px 0 rgba(61, 50, 41, 0.5))
+    drop-shadow(0 1.5px 2px rgba(61, 50, 41, 0.32));
+  --smartisan-stamp-dark-color: var(--smartisan-gilt);
+  --smartisan-stamp-dark-color-hover: var(--smartisan-gilt-bright);
+  --smartisan-stamp-dark-filter:
+    drop-shadow(0 1px 0 rgba(0, 0, 0, 0.55))
+    drop-shadow(0 -0.5px 0 rgba(232, 208, 160, 0.4))
+    drop-shadow(0 0 2px rgba(201, 166, 107, 0.28));
+  --smartisan-stamp-dark-filter-hover:
+    drop-shadow(0 1px 0 rgba(0, 0, 0, 0.6))
+    drop-shadow(0 -0.5px 0 rgba(255, 236, 200, 0.45))
+    drop-shadow(0 0 3px rgba(232, 208, 160, 0.35));
+
+  /* Vault nameplate — wood-desk label (木纹铭牌 + light stamp shadow) */
+  --smartisan-vault-name-font: var(--font-text-theme);
+  --smartisan-vault-name-size: 13px;
+  --smartisan-vault-name-weight: 500;
+  --smartisan-vault-name-tracking: 0.08em;
+  --smartisan-vault-name-pad-block: 4px;
+  --smartisan-vault-name-pad-inline: 10px;
+  --smartisan-vault-name-rule-inset: 14%;
+  /* Light wood: warm bronze nameplate (not cold ink-black) */
+  --smartisan-vault-name-bronze: #a6844a;
+  --smartisan-vault-name-bronze-hover: #c9a66b;
+  --smartisan-vault-name-bronze-shadow:
+    0 1px 0 rgba(255, 236, 200, 0.62),
+    0 -1px 0 rgba(120, 85, 40, 0.32),
+    0 1px 2px rgba(166, 124, 82, 0.28);
+  --smartisan-vault-name-bronze-shadow-hover:
+    0 1px 0 rgba(255, 244, 220, 0.72),
+    0 -1px 0 rgba(140, 98, 48, 0.38),
+    0 1px 3px rgba(201, 166, 107, 0.34);
+  --smartisan-vault-name-bronze-rule: rgba(166, 124, 82, 0.38);
+
+  --shadow-s: 0 1px 2px var(--smartisan-shadow-soft), 0 1px 1px rgba(61, 50, 41, 0.05);
+  --shadow-m: 0 3px 10px var(--smartisan-shadow), 0 1px 3px var(--smartisan-shadow-soft);
+  --shadow-l: 0 12px 32px rgba(61, 50, 41, 0.2), 0 4px 10px var(--smartisan-shadow-soft);
+
+  --h1-size: 1.55em;
+  --h2-size: 1.35em;
+  --h3-size: 1.18em;
+  --h1-weight: 600;
+  --h2-weight: 600;
+  --h3-weight: 600;
+  --bold-weight: 650;
+
+  --h1-color: var(--text-normal);
+  --h2-color: var(--text-normal);
+  --h3-color: var(--text-accent);
+  --h4-color: var(--text-muted);
+  --h5-color: var(--text-muted);
+  --h6-color: var(--text-faint);
+
+  --link-decoration: none;
+  --link-external-decoration: underline;
+  --link-unresolved-decoration: underline;
+  --link-unresolved-opacity: 0.7;
+
+  --blockquote-border-thickness: 3px;
+  --blockquote-border-color: var(--smartisan-accent);
+  --hr-thickness: 1px;
+  --hr-color: #d4c4a8;
+  /* Horizontal rule (---) · scheme B: 线装册页 · 中心订点 */
+  --smartisan-hr-rule-inset: 18%;
+  --smartisan-hr-stitch-size: 7px;
+  --smartisan-hr-stitch-border: 1.5px;
+
+  --indentation-guide-width: 0px;
+  --indentation-guide-color: transparent;
+  --indentation-guide-color-active: transparent;
+
+  --icon-muted: 0.72;
+
+  /* Desk-surface variant textures (body.smartisan-desk-* via companion plugin) */
+  --smartisan-tex-leather: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='l'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.35' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.28 0 0 0 0 0.18 0 0 0 0 0.1 0 0 0 0.38 0'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23l)' opacity='0.55'/%3E%3C/svg%3E");
+  --smartisan-tex-cork: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='c'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.42' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.42 0 0 0 0 0.28 0 0 0 0 0.12 0 0 0 0.5 0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23c)' opacity='0.62'/%3E%3C/svg%3E");
+  --smartisan-tex-felt: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.8' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.22 0 0 0 0 0.18 0 0 0 0 0.14 0 0 0 0.18 0'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23f)' opacity='0.42'/%3E%3C/svg%3E");
+  --smartisan-tex-lacquer: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='q'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.55 0.02' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.12 0 0 0 0 0.1 0 0 0 0 0.08 0 0 0 0.12 0'/%3E%3C/filter%3E%3Crect width='240' height='240' filter='url(%23q)' opacity='0.35'/%3E%3C/svg%3E");
+  /* Dark-mode desk textures — gilt/cream fibers readable on near-black chrome */
+  --smartisan-tex-wood-dark: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='280' height='280'%3E%3Cdefs%3E%3Cfilter id='w'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85 0.035' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.84 0 0 0 0 0.74 0 0 0 0 0.58 0 0 0 0.38 0'/%3E%3C/filter%3E%3C/defs%3E%3Cg transform='rotate(32 140 140)'%3E%3Crect x='-90' y='-90' width='460' height='460' filter='url(%23w)' opacity='0.82'/%3E%3C/g%3E%3C/svg%3E");
+  --smartisan-tex-wood-vertical-dark: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='280' height='280'%3E%3Cdefs%3E%3Cfilter id='w'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.035 0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.84 0 0 0 0 0.74 0 0 0 0 0.58 0 0 0 0.38 0'/%3E%3C/filter%3E%3C/defs%3E%3Cg transform='rotate(90 140 140)'%3E%3Crect x='-90' y='-90' width='460' height='460' filter='url(%23w)' opacity='0.82'/%3E%3C/g%3E%3C/svg%3E");
+  --smartisan-tex-leather-dark: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='l'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.35' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.82 0 0 0 0 0.7 0 0 0 0 0.55 0 0 0 0.48 0'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23l)' opacity='0.68'/%3E%3C/svg%3E");
+  --smartisan-tex-cork-dark: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='c'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.42' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.86 0 0 0 0 0.66 0 0 0 0 0.4 0 0 0 0.62 0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23c)' opacity='0.78'/%3E%3C/svg%3E");
+  --smartisan-tex-felt-dark: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.8' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.78 0 0 0 0 0.72 0 0 0 0 0.66 0 0 0 0.28 0'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23f)' opacity='0.55'/%3E%3C/svg%3E");
+  --smartisan-tex-lacquer-dark: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='q'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.55 0.02' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.9 0 0 0 0 0.84 0 0 0 0 0.76 0 0 0 0.28 0'/%3E%3C/filter%3E%3Crect width='240' height='240' filter='url(%23q)' opacity='0.5'/%3E%3C/svg%3E");
+}
+
+/* ========== Light scheme ==========
+ * Primary surface tokens — plugins & official views inherit these automatically.
+ */
+.theme-light {
+  color-scheme: light;
+  --highlight-mix-blend-mode: darken;
+
+  --mono-rgb-0: 255, 255, 255;
+  --mono-rgb-100: 61, 50, 41;
+
+  --color-red-rgb: 154, 74, 58;
+  --color-red: #9a4a3a;
+  --color-orange-rgb: 139, 105, 20;
+  --color-orange: #8b6914;
+  --color-yellow-rgb: 201, 166, 107;
+  --color-yellow: #c9a66b;
+  --color-green-rgb: 74, 107, 58;
+  --color-green: #4a6b3a;
+  --color-cyan-rgb: 90, 130, 120;
+  --color-cyan: #5a8278;
+  --color-blue-rgb: 90, 110, 140;
+  --color-blue: #5a6e8c;
+  --color-purple-rgb: 120, 100, 130;
+  --color-purple: #786482;
+  --color-pink-rgb: 180, 120, 110;
+  --color-pink: #b4786e;
+
+  --color-base-00: #e4d6c0;
+  --color-base-05: #ddd0b8;
+  --color-base-10: #d6c7ad;
+  --color-base-20: #cdb99a;
+  --color-base-25: #c4ae88;
+  --color-base-30: #b89f72;
+  --color-base-35: #a67c52;
+  --color-base-40: #8f6a45;
+  --color-base-50: #8a8075;
+  --color-base-60: #6b5f54;
+  --color-base-70: #5c4033;
+  --color-base-100: #3d3229;
+
+  --accent-h: 35;
+  --accent-s: 42%;
+  --accent-l: 60%;
+  --color-accent-hsl: var(--accent-h), var(--accent-s), var(--accent-l);
+  --color-accent: hsl(var(--color-accent-hsl));
+  --color-accent-1: hsl(var(--accent-h), var(--accent-s), calc(var(--accent-l) + 4%));
+  --color-accent-2: hsl(var(--accent-h), var(--accent-s), calc(var(--accent-l) + 8%));
+  --interactive-accent-hsl: var(--color-accent-hsl);
+
+  --background-primary: var(--smartisan-paper-cream);
+  --background-primary-alt: var(--smartisan-paper-warm);
+  /*
+   * Secondary must stay in the same paper family as primary.
+   * Plugins that correctly use --background-primary / --background-secondary
+   * (Weave, etc.) should then match the markdown content surface.
+   */
+  --background-secondary: var(--smartisan-paper-warm);
+  --background-secondary-alt: #d0be9e;
+  --background-modifier-hover: rgba(201, 166, 107, 0.18);
+  --background-modifier-active-hover: rgba(201, 166, 107, 0.28);
+  --background-modifier-border: #cdb991;
+  --background-modifier-border-hover: #b89562;
+  --background-modifier-border-focus: var(--smartisan-accent);
+  --background-modifier-form-field: #e8dcc8;
+  --background-modifier-success: #d8e8c8;
+  --background-modifier-error: #f0d4cc;
+  --background-modifier-error-rgb: 240, 212, 204;
+  --background-modifier-error-hover: #e8c4ba;
+  --background-modifier-cover: rgba(70, 48, 32, 0.45);
+  --background-modifier-box-shadow: rgba(61, 50, 41, 0.12);
+
+  --text-normal: var(--smartisan-ink);
+  --text-muted: var(--smartisan-ink-muted);
+  --text-faint: var(--smartisan-ink-faint);
+  --text-on-accent: #fffaf2;
+  --text-on-accent-inverted: var(--smartisan-ink);
+  --text-success: var(--color-green);
+  --text-warning: var(--color-orange);
+  --text-error: var(--color-red);
+  --text-accent: #8b5e3c;
+  --text-accent-hover: var(--smartisan-wood-dark);
+  --text-selection: rgba(201, 166, 107, 0.35);
+  --text-highlight-bg: rgba(201, 166, 107, 0.38);
+  --text-highlight-bg-active: rgba(201, 166, 107, 0.52);
+
+  --interactive-normal: #e0d2ba;
+  --interactive-hover: #d6c6ac;
+  --interactive-accent: var(--smartisan-accent);
+  --interactive-accent-hover: var(--smartisan-accent-hover);
+  --interactive-accent-rgb: 201, 166, 107;
+
+  --link-color: #8b5e3c;
+  --link-color-hover: var(--smartisan-wood-dark);
+  --link-external-color: #7a6848;
+  --link-external-color-hover: var(--smartisan-wood-dark);
+  --link-unresolved-color: var(--text-faint);
+
+  --titlebar-background: var(--smartisan-editor-desk-solid);
+  --titlebar-background-focused: var(--smartisan-editor-desk-solid);
+  /* Light desk → ink chrome (gilt is for dark desk only) */
+  --titlebar-text-color: var(--smartisan-ink-muted);
+  --titlebar-text-color-focused: var(--smartisan-ink);
+
+  /* Top tabs / side chrome sit on mid oak desk — ink text, cream active chip */
+  --tab-container-background: var(--smartisan-editor-desk-solid);
+  --tab-background-active: transparent;
+  --tab-text-color: var(--smartisan-ink-muted);
+  --tab-text-color-active: var(--smartisan-ink);
+  --tab-text-color-focused: var(--smartisan-ink-muted);
+  --tab-text-color-focused-active: var(--smartisan-ink);
+  --tab-text-color-focused-active-current: var(--smartisan-ink);
+  --tab-text-color-focused-highlighted: var(--smartisan-ink);
+  --tab-outline-color: transparent;
+  --tab-divider-color: transparent;
+
+  --nav-item-background-hover: rgba(255, 248, 236, 0.12);
+  --nav-item-background-active: rgba(255, 248, 236, 0.22);
+  --nav-item-background-selected: rgba(255, 248, 236, 0.22);
+  --nav-indentation-guide-color: transparent;
+  --nav-indentation-guide-width: 0px;
+  --nav-item-color: var(--smartisan-ink);
+  --nav-item-color-hover: var(--smartisan-ink);
+  --nav-item-color-active: var(--smartisan-ink);
+  --nav-item-color-selected: var(--smartisan-ink);
+  --nav-collapse-icon-color: var(--smartisan-ink-muted);
+  --nav-collapse-icon-color-collapsed: var(--smartisan-ink-faint);
+
+  --icon-color: var(--smartisan-ink-muted);
+  --icon-color-hover: var(--smartisan-ink);
+  --icon-color-focused: var(--smartisan-ink);
+  --icon-color-active: var(--smartisan-ink);
+
+  --checkbox-color: var(--smartisan-accent);
+  --checkbox-color-hover: var(--smartisan-accent-hover);
+  --checkbox-border-color: #c4a574;
+  --checkbox-border-color-hover: var(--smartisan-accent-hover);
+
+  --slider-track-background: #e2d3b8;
+  --slider-thumb-border-color: #c4a574;
+
+  --divider-color: transparent;
+  --ribbon-background: var(--smartisan-editor-desk-solid);
+  --ribbon-background-collapsed: var(--smartisan-editor-desk-solid);
+
+  --graph-line: #b89562;
+  --graph-node: #c9a66b;
+  --graph-node-focused: #8b5e3c;
+  --graph-node-unresolved: #d9c7a5;
+  --graph-node-tag: #a8b88a;
+  --graph-node-attachment: #b8a898;
+  /* Walnut desk: warm paper cream (ink-muted fails contrast on brown) */
+  --graph-text: #faf6ee;
+
+  --canvas-background: var(--smartisan-paper-fill);
+  --canvas-dot-pattern: rgba(92, 64, 51, 0.16);
+  --canvas-card-label-color: var(--smartisan-ink);
+  /* Obsidian uses rgb(var(--canvas-color)) — must be R,G,B triplets, not hex */
+  --canvas-color-1: var(--color-red-rgb);
+  --canvas-color-2: var(--color-orange-rgb);
+  --canvas-color-3: var(--color-yellow-rgb);
+  --canvas-color-4: var(--color-green-rgb);
+  --canvas-color-5: var(--color-cyan-rgb);
+  --canvas-color-6: var(--color-purple-rgb);
+
+  --code-background: #d9cbb4;
+  --code-normal: #5c4033;
+  --code-comment: #8a8075;
+  --code-string: #6b5f54;
+  --code-keyword: #8b5e3c;
+  --code-function: #5c4033;
+  --code-operator: #6b5f54;
+  --code-tag: #8b5e3c;
+  --code-property: #7a6848;
+  --code-value: #5c4033;
+  --code-punctuation: #8a8075;
+
+  --table-border-color: #d4c4a8;
+  --table-header-background: #f0e4cf;
+  --table-row-background-hover: rgba(201, 166, 107, 0.12);
+  --table-row-alt-background: rgba(240, 228, 207, 0.55);
+
+  --tag-size: 0.84em;
+  --tag-color: #8b5e3c;
+  --tag-color-hover: var(--smartisan-wood-dark);
+  --tag-background: rgba(201, 166, 107, 0.22);
+  --tag-background-hover: rgba(201, 166, 107, 0.34);
+  --tag-border-color: rgba(201, 166, 107, 0.35);
+  --tag-border-color-hover: rgba(166, 124, 82, 0.45);
+  --tag-border-width: 1px;
+  --tag-padding-x: 0.55em;
+  --tag-padding-y: 0.12em;
+  --tag-radius: 999px;
+
+  --callout-border-width: 1px;
+  --callout-border-opacity: 0.35;
+  --callout-padding: 0.85em 1em;
+  --callout-radius: var(--radius-m);
+  --callout-title-color: var(--smartisan-ink);
+  --callout-title-padding: 0;
+  --callout-content-padding: 0.35em 0 0;
+  --callout-default: #f0e4cf;
+  --callout-note: #ebe4d4;
+  --callout-tip: #e4ecd8;
+  --callout-important: #f0e0d0;
+  --callout-warning: #f2e6c8;
+  --callout-caution: #f0d8cc;
+  --callout-question: #e4e8d4;
+  --callout-success: #dce8cc;
+  --callout-fail: #ecd8d0;
+  --callout-bug: #e8dce8;
+  --callout-example: #e8e4d8;
+  --callout-quote: #f0e8dc;
+
+  --search-result-background: transparent;
+  --search-result-background-hover: rgba(201, 166, 107, 0.14);
+  --search-result-background-active: rgba(201, 166, 107, 0.22);
+
+  --caret-color: var(--smartisan-accent-hover);
+
+  /* Properties / YAML editor — keep key/value chrome stable on paper */
+  --metadata-background: transparent;
+  --metadata-border-color: var(--background-modifier-border);
+  --metadata-border-radius: var(--radius-m);
+  --metadata-border-width: 0;
+  --metadata-padding: 0.5em 0;
+  --metadata-gap: 2px;
+  --metadata-divider-color: transparent;
+  --metadata-divider-color-hover: transparent;
+  --metadata-divider-color-focus: transparent;
+  --metadata-property-background: transparent;
+  --metadata-property-background-hover: transparent;
+  --metadata-property-background-active: transparent;
+  --metadata-property-box-shadow: none;
+  --metadata-property-box-shadow-hover: none;
+  --metadata-property-box-shadow-focus: none;
+  --metadata-property-radius: var(--radius-s);
+  --metadata-property-radius-hover: var(--radius-s);
+  --metadata-property-radius-focus: var(--radius-s);
+  --metadata-label-background: transparent;
+  --metadata-label-background-hover: transparent;
+  --metadata-label-background-active: transparent;
+  --metadata-label-text-color: var(--smartisan-ink);
+  --metadata-label-text-color-hover: var(--smartisan-ink);
+  --metadata-input-background: transparent;
+  --metadata-input-background-hover: transparent;
+  --metadata-input-background-active: transparent;
+  --metadata-input-text-color: var(--smartisan-ink);
+
+  --smartisan-strip-bg: linear-gradient(180deg, #ebe0cc 0%, #e0d2ba 55%, #d6c6ac 100%);
+  --smartisan-strip-border: rgba(92, 64, 51, 0.12);
+  --smartisan-panel-wood: linear-gradient(180deg, #c9ae80 0%, #b89562 50%, #a67c52 100%);
+  /* Light-mode default desk: walnut */
+  --smartisan-wood-grain-angle: 28deg;
+  --smartisan-desk-bg: linear-gradient(165deg, #c8a882 0%, #9a6848 42%, #7a5038 100%);
+  --smartisan-editor-desk: linear-gradient(165deg, #b88860 0%, #8f5c40 48%, #704830 100%);
+  --smartisan-editor-desk-solid: #8f5c40;
+  --smartisan-editor-desk-surface:
+    var(--smartisan-wood-texture),
+    repeating-linear-gradient(
+      var(--smartisan-wood-grain-angle),
+      rgba(72, 40, 28, 0.12) 0px,
+      rgba(72, 40, 28, 0.12) 1px,
+      transparent 1px,
+      transparent 8px
+    ),
+    var(--smartisan-editor-desk);
+  --smartisan-paper-surface:
+    var(--smartisan-paper-suede-texture),
+    var(--smartisan-paper-texture),
+    linear-gradient(180deg, rgba(255, 248, 236, 0.14) 0%, transparent 38%, rgba(92, 64, 51, 0.09) 100%);
+  --smartisan-paper-bg-blend: multiply, soft-light, normal;
+  /* Solid chrome color matches content-area desk frame */
+  --smartisan-ribbon-color: var(--smartisan-editor-desk-solid);
+  /* Light paper gilt line — softer than dark lacquer frame */
+  --smartisan-gilt-frame-border: rgba(166, 124, 82, 0.62);
+  --smartisan-gilt-frame-outer: rgba(201, 166, 107, 0.28);
+  --smartisan-gilt-frame-highlight: rgba(232, 208, 160, 0.42);
+  --smartisan-gilt-frame-shadow: rgba(92, 64, 51, 0.12);
+  --smartisan-gilt-frame-glow: rgba(201, 166, 107, 0.1);
+  --smartisan-gilt-frame-shadow-stack:
+    0 0 0 1px var(--smartisan-gilt-frame-outer),
+    inset 0 1px 0 var(--smartisan-gilt-frame-highlight),
+    inset 0 -1px 0 var(--smartisan-gilt-frame-shadow),
+    0 0 10px var(--smartisan-gilt-frame-glow);
+}
+
+/* ========== Dark scheme ========== */
+.theme-dark {
+  color-scheme: dark;
+  --highlight-mix-blend-mode: lighten;
+
+  --mono-rgb-0: 42, 33, 28;
+  --mono-rgb-100: 232, 223, 208;
+
+  --color-red-rgb: 212, 160, 152;
+  --color-red: #d4a098;
+  --color-orange-rgb: 212, 184, 120;
+  --color-orange: #d4b878;
+  --color-yellow-rgb: 232, 208, 168;
+  --color-yellow: #e8d0a8;
+  --color-green-rgb: 168, 200, 152;
+  --color-green: #a8c898;
+  --color-cyan-rgb: 140, 170, 160;
+  --color-cyan: #8caaa0;
+  --color-blue-rgb: 140, 160, 180;
+  --color-blue: #8ca0b4;
+  --color-purple-rgb: 160, 140, 170;
+  --color-purple: #a08caa;
+  --color-pink-rgb: 190, 150, 140;
+  --color-pink: #be968c;
+
+  --color-base-00: #2a211c;
+  --color-base-05: #312822;
+  --color-base-10: #3a322c;
+  --color-base-20: #453c35;
+  --color-base-25: #4f463e;
+  --color-base-30: #5a5047;
+  --color-base-35: #6b5f54;
+  --color-base-40: #8a8075;
+  --color-base-50: #a69888;
+  --color-base-60: #c4b8a8;
+  --color-base-70: #ddd2c4;
+  --color-base-100: #e8dfd0;
+
+  --accent-h: 38;
+  --accent-s: 38%;
+  --accent-l: 62%;
+  --color-accent-hsl: var(--accent-h), var(--accent-s), var(--accent-l);
+  --color-accent: hsl(var(--color-accent-hsl));
+  --color-accent-1: hsl(var(--accent-h), var(--accent-s), calc(var(--accent-l) + 5%));
+  --color-accent-2: hsl(var(--accent-h), var(--accent-s), calc(var(--accent-l) + 10%));
+  --interactive-accent-hsl: var(--color-accent-hsl);
+
+  --smartisan-paper-fill: #3f3730;
+  --smartisan-canvas-card-fill: #f8f4ec;
+  --smartisan-canvas-ink: 210, 196, 172;
+  --smartisan-canvas-default-border: var(--smartisan-canvas-ink);
+  --background-primary: #3f3730;
+  --background-primary-alt: #4a4139;
+  --background-secondary: #2c241f;
+  --background-secondary-alt: #241d19;
+  --background-modifier-hover: rgba(201, 166, 107, 0.14);
+  --background-modifier-active-hover: rgba(201, 166, 107, 0.22);
+  --background-modifier-border: #5a5047;
+  --background-modifier-border-hover: #6b5f54;
+  --background-modifier-border-focus: #c9a66b;
+  --background-modifier-form-field: #453c35;
+  --background-modifier-success: #3a4a32;
+  --background-modifier-error: #5a3a32;
+  --background-modifier-error-rgb: 90, 58, 50;
+  --background-modifier-error-hover: #6a4a42;
+  --background-modifier-cover: rgba(14, 10, 8, 0.62);
+  --background-modifier-box-shadow: rgba(0, 0, 0, 0.28);
+
+  --text-normal: #e8dfd0;
+  --text-muted: #c4b8a8;
+  --text-faint: #a69888;
+  --text-on-accent: #2a211c;
+  --text-on-accent-inverted: #e8dfd0;
+  --text-success: var(--color-green);
+  --text-warning: var(--color-orange);
+  --text-error: var(--color-red);
+  --text-accent: #d4b878;
+  --text-accent-hover: #e8d0a8;
+  --text-selection: rgba(201, 166, 107, 0.28);
+  --text-highlight-bg: rgba(201, 166, 107, 0.32);
+  --text-highlight-bg-active: rgba(201, 166, 107, 0.45);
+
+  --interactive-normal: #453c35;
+  --interactive-hover: #4f463e;
+  --interactive-accent: #c9a66b;
+  --interactive-accent-hover: #d4b878;
+  --interactive-accent-rgb: 201, 166, 107;
+
+  --link-color: #d4b878;
+  --link-color-hover: #e8d0a8;
+  --link-external-color: #c4b098;
+  --link-external-color-hover: #e8d0a8;
+  --link-unresolved-color: var(--text-faint);
+
+  --titlebar-background: var(--smartisan-editor-desk-solid);
+  --titlebar-background-focused: var(--smartisan-editor-desk-solid);
+  --titlebar-text-color: #e8dfd0;
+  --titlebar-text-color-focused: #e8dfd0;
+
+  --tab-container-background: var(--smartisan-editor-desk-solid);
+  --tab-background-active: transparent;
+  --tab-text-color: #c4b8a8;
+  --tab-text-color-active: #e8dfd0;
+  --tab-text-color-focused: #c4b8a8;
+  --tab-text-color-focused-active: #e8dfd0;
+  --tab-text-color-focused-active-current: #e8dfd0;
+  --tab-text-color-focused-highlighted: #e8dfd0;
+  --tab-outline-color: transparent;
+  --tab-divider-color: transparent;
+
+  --nav-item-background-hover: rgba(255, 248, 236, 0.08);
+  --nav-item-background-active: rgba(255, 248, 236, 0.14);
+  --nav-item-background-selected: rgba(255, 248, 236, 0.14);
+  --nav-indentation-guide-color: transparent;
+  --nav-indentation-guide-width: 0px;
+  --nav-item-color: #e8dfd0;
+  --nav-item-color-hover: #e8dfd0;
+  --nav-item-color-active: #e8dfd0;
+  --nav-item-color-selected: #e8dfd0;
+  --nav-collapse-icon-color: #c4b8a8;
+  --nav-collapse-icon-color-collapsed: #a69888;
+
+  --icon-color: #c4b8a8;
+  --icon-color-hover: #e8dfd0;
+  --icon-color-focused: #e8dfd0;
+  --icon-color-active: #e8dfd0;
+
+  --checkbox-color: #c9a66b;
+  --checkbox-color-hover: #d4b878;
+  --checkbox-border-color: #8a8075;
+  --checkbox-border-color-hover: #c9a66b;
+
+  --slider-track-background: #5a5047;
+  --slider-thumb-border-color: #8a8075;
+
+  --divider-color: transparent;
+  --ribbon-background: var(--smartisan-editor-desk-solid);
+  --ribbon-background-collapsed: var(--smartisan-editor-desk-solid);
+
+  --graph-line: #6b5f54;
+  --graph-node: #c9a66b;
+  --graph-node-focused: #e8d0a8;
+  --graph-node-unresolved: #5a5047;
+  --graph-node-tag: #7a8a68;
+  --graph-node-attachment: #8a7a68;
+  /* Lacquer desk: gilt labels — same family as dark chrome text */
+  --graph-text: var(--smartisan-gilt);
+
+  --canvas-background: var(--smartisan-paper-fill);
+  --canvas-dot-pattern: rgba(232, 223, 208, 0.12);
+  --canvas-card-label-color: #e8dfd0;
+  --canvas-color-1: var(--color-red-rgb);
+  --canvas-color-2: var(--color-orange-rgb);
+  --canvas-color-3: var(--color-yellow-rgb);
+  --canvas-color-4: var(--color-green-rgb);
+  --canvas-color-5: var(--color-cyan-rgb);
+  --canvas-color-6: var(--color-purple-rgb);
+
+  --code-background: #312822;
+  --code-normal: #e8dfd0;
+  --code-comment: #a69888;
+  --code-string: #c4b8a8;
+  --code-keyword: #d4b878;
+  --code-function: #e8dfd0;
+  --code-operator: #c4b8a8;
+  --code-tag: #d4b878;
+  --code-property: #c4b098;
+  --code-value: #e8dfd0;
+  --code-punctuation: #a69888;
+
+  --table-border-color: #5a5047;
+  --table-header-background: #453c35;
+  --table-row-background-hover: rgba(201, 166, 107, 0.1);
+  --table-row-alt-background: rgba(69, 60, 53, 0.55);
+
+  --tag-color: #d4b878;
+  --tag-color-hover: #e8d0a8;
+  --tag-background: rgba(201, 166, 107, 0.18);
+  --tag-background-hover: rgba(201, 166, 107, 0.28);
+  --tag-border-color: rgba(201, 166, 107, 0.28);
+  --tag-border-color-hover: rgba(212, 184, 120, 0.38);
+
+  --callout-title-color: #e8dfd0;
+  --callout-default: #453c35;
+  --callout-note: #4a4139;
+  --callout-tip: #3f4638;
+  --callout-important: #4a4238;
+  --callout-warning: #4a4438;
+  --callout-caution: #4a3c38;
+  --callout-question: #424a3c;
+  --callout-success: #3e4a38;
+  --callout-fail: #4a3e3c;
+  --callout-bug: #443c44;
+  --callout-example: #46423c;
+  --callout-quote: #4a443c;
+
+  --search-result-background: transparent;
+  --search-result-background-hover: rgba(201, 166, 107, 0.12);
+  --search-result-background-active: rgba(201, 166, 107, 0.2);
+
+  --caret-color: #d4b878;
+
+  --metadata-background: transparent;
+  --metadata-border-color: var(--background-modifier-border);
+  --metadata-border-radius: var(--radius-m);
+  --metadata-border-width: 0;
+  --metadata-padding: 0.5em 0;
+  --metadata-gap: 2px;
+  --metadata-divider-color: transparent;
+  --metadata-divider-color-hover: transparent;
+  --metadata-divider-color-focus: transparent;
+  --metadata-property-background: transparent;
+  --metadata-property-background-hover: transparent;
+  --metadata-property-background-active: transparent;
+  --metadata-property-box-shadow: none;
+  --metadata-property-box-shadow-hover: none;
+  --metadata-property-box-shadow-focus: none;
+  --metadata-property-radius: var(--radius-s);
+  --metadata-property-radius-hover: var(--radius-s);
+  --metadata-property-radius-focus: var(--radius-s);
+  --metadata-label-background: transparent;
+  --metadata-label-background-hover: transparent;
+  --metadata-label-background-active: transparent;
+  --metadata-label-text-color: var(--text-normal);
+  --metadata-label-text-color-hover: var(--text-normal);
+  --metadata-input-background: transparent;
+  --metadata-input-background-hover: transparent;
+  --metadata-input-background-active: transparent;
+  --metadata-input-text-color: var(--text-normal);
+
+  --smartisan-paper-line: rgba(232, 223, 208, 0.09);
+  --smartisan-margin-red: rgba(180, 120, 120, 0.45);
+  --smartisan-strip-bg: linear-gradient(180deg, #4a4139 0%, #3f3730 55%, #38312b 100%);
+  --smartisan-strip-border: rgba(0, 0, 0, 0.28);
+  --smartisan-panel-wood: linear-gradient(180deg, #2c241f 0%, #241d19 50%, #1c1612 100%);
+  /* Dark-mode default desk: lacquer */
+  --smartisan-wood-texture: var(--smartisan-tex-lacquer-dark);
+  --smartisan-desk-bg: linear-gradient(168deg, #1a1a24 0%, #0e0e16 50%, #06060a 100%);
+  --smartisan-editor-desk: linear-gradient(168deg, #12121a 0%, #0a0a10 55%, #040406 100%);
+  --smartisan-editor-desk-solid: #0a0a10;
+  --smartisan-editor-desk-surface:
+    var(--smartisan-wood-texture),
+    linear-gradient(180deg, rgba(240, 230, 210, 0.16) 0%, transparent 38%, rgba(0, 0, 0, 0.32) 100%),
+    var(--smartisan-editor-desk);
+  --smartisan-paper-surface:
+    var(--smartisan-paper-suede-texture),
+    var(--smartisan-paper-texture),
+    linear-gradient(180deg, rgba(255, 248, 236, 0.05) 0%, transparent 42%, rgba(0, 0, 0, 0.16) 100%);
+  --smartisan-paper-bg-blend: soft-light, overlay, normal;
+  --smartisan-ribbon-color: var(--smartisan-editor-desk-solid);
+  /* Dark desk gilt frame — side-dock content area */
+  --smartisan-gilt-frame-border: rgba(212, 184, 120, 0.72);
+  --smartisan-gilt-frame-outer: rgba(201, 166, 107, 0.24);
+  --smartisan-gilt-frame-highlight: rgba(232, 208, 160, 0.3);
+  --smartisan-gilt-frame-shadow: rgba(48, 38, 28, 0.5);
+  --smartisan-gilt-frame-glow: rgba(201, 166, 107, 0.14);
+  --smartisan-gilt-frame-shadow-stack:
+    0 0 0 1px var(--smartisan-gilt-frame-outer),
+    inset 0 1px 0 var(--smartisan-gilt-frame-highlight),
+    inset 0 -1px 0 var(--smartisan-gilt-frame-shadow),
+    0 0 14px var(--smartisan-gilt-frame-glow);
+}
+
+:root {
+  --input-hover-border-color: var(--smartisan-accent);
+  --input-focus-border-color: var(--smartisan-accent-hover);
+  --input-focus-outline: 1px solid var(--background-modifier-border-focus);
+  --input-shadow: inset 0 0 0 1px var(--background-modifier-border);
+  --input-shadow-hover: inset 0 0 0 1px var(--background-modifier-border-hover);
+}
+
+/* ========== Wood desk backgrounds ========== */
+body.theme-light {
+  --smartisan-wood-bg:
+    var(--smartisan-wood-texture),
+    repeating-linear-gradient(
+      var(--smartisan-wood-grain-angle),
+      rgba(92, 64, 51, 0.045) 0px,
+      rgba(92, 64, 51, 0.045) 1px,
+      transparent 1px,
+      transparent 7px
+    ),
+    var(--smartisan-desk-bg);
+}
+
+body.theme-dark {
+  --smartisan-wood-bg:
+    var(--smartisan-wood-texture),
+    linear-gradient(180deg, rgba(232, 220, 200, 0.14) 0%, transparent 32%, rgba(0, 0, 0, 0.28) 100%),
+    var(--smartisan-desk-bg);
+}
+
+body,
+.app-container {
+  background: var(--smartisan-wood-bg);
+  background-attachment: fixed;
+}
+
+/* ========== Workspace chrome ==========
+ * Side docks + top tabs use the same desk surface as the content-area frame.
+ */
+.workspace-ribbon.mod-left,
+.workspace-ribbon.mod-right,
+.side-dock-ribbon,
+.workspace-split.mod-left-split .workspace-tabs,
+.workspace-split.mod-right-split .workspace-tabs,
+.titlebar,
+.workspace-tabs.mod-top,
+.workspace-tab-header-container,
+.status-bar {
+  background-color: var(--smartisan-editor-desk-solid);
+  background-image: var(--smartisan-editor-desk-surface);
+  background-blend-mode: normal;
+  background-size: auto, auto, auto;
+  background-repeat: repeat;
+  background-attachment: fixed;
+  border: none;
+  box-shadow: none;
+}
+
+.workspace-split.mod-left-split,
+.workspace-split.mod-right-split {
+  border: none;
+  box-shadow: none;
+  background-color: var(--smartisan-editor-desk-solid);
+  background-image: var(--smartisan-editor-desk-surface);
+  background-blend-mode: normal;
+  background-attachment: fixed;
+}
+
+/* Chrome icons: light desk → ink; dark desk → gilt.
+ * Do NOT set --text-* on .workspace-tabs.mod-top itself:
+ * that wrapper also contains the editor and would wash out note text.
+ */
+.theme-light .workspace-ribbon,
+.theme-light .side-dock-ribbon,
+.theme-light .workspace-tab-header-container,
+.theme-light .status-bar {
+  --icon-color: var(--smartisan-ink-muted);
+  --icon-color-hover: var(--smartisan-ink);
+  --icon-color-focused: var(--smartisan-ink);
+  --icon-color-active: var(--smartisan-ink);
+  --text-normal: var(--smartisan-ink);
+  --text-muted: var(--smartisan-ink-muted);
+  --text-faint: var(--smartisan-ink-faint);
+  color: var(--smartisan-ink);
+}
+
+.theme-dark .workspace-ribbon,
+.theme-dark .side-dock-ribbon,
+.theme-dark .workspace-tab-header-container,
+.theme-dark .status-bar {
+  --icon-color: var(--smartisan-gilt);
+  --icon-color-hover: var(--smartisan-gilt-bright);
+  --icon-color-focused: var(--smartisan-gilt-bright);
+  --icon-color-active: var(--smartisan-gilt-bright);
+  --text-normal: var(--smartisan-gilt);
+  --text-muted: var(--smartisan-gilt-muted);
+  --text-faint: var(--smartisan-gilt-muted);
+  color: var(--smartisan-gilt);
+}
+
+/* Restore ink text inside note paper (under top tabs) */
+.workspace-tabs.mod-top .workspace-tab-container {
+  --text-normal: var(--smartisan-ink);
+  --text-muted: var(--smartisan-ink-muted);
+  --text-faint: var(--smartisan-ink-faint);
+  --icon-color: var(--smartisan-ink-muted);
+  --icon-color-hover: var(--smartisan-ink);
+  --icon-color-focused: var(--smartisan-ink);
+  --icon-color-active: var(--smartisan-ink);
+  color: var(--smartisan-ink);
+}
+
+.theme-dark .workspace-tabs.mod-top .workspace-tab-container {
+  --text-normal: #e8dfd0;
+  --text-muted: #c4b8a8;
+  --text-faint: #a69888;
+  --icon-color: #c4b8a8;
+  --icon-color-hover: #e8dfd0;
+  --icon-color-focused: #e8dfd0;
+  --icon-color-active: #e8dfd0;
+  color: #e8dfd0;
+}
+
+/* Titlebar left/right control wells: same desk texture as surrounding chrome */
+.titlebar-button-container.mod-left,
+.titlebar-button-container.mod-right,
+.is-hidden-frameless:not(.is-fullscreen) .titlebar-button-container.mod-right,
+.is-hidden-frameless:not(.is-fullscreen).is-focused .titlebar-button-container.mod-right {
+  background-color: var(--smartisan-editor-desk-solid);
+  background-image: var(--smartisan-editor-desk-surface);
+  background-attachment: fixed;
+  background-blend-mode: normal;
+}
+
+/*
+ * Left-corner sidebar toggle:
+ * Obsidian uses margin-top + solid :before (titlebar color) for the
+ * ribbon-width × header-height corner — that solid block never gets texture.
+ * Root fix: drop the margin gap so the textured ribbon fills the corner,
+ * keep icons below via padding, and force :before onto the same desk surface.
+ */
+.workspace-ribbon.mod-left {
+  margin-top: 0;
+  padding-top: var(--header-height);
+  box-sizing: border-box;
+  background-color: var(--smartisan-editor-desk-solid);
+  background-image: var(--smartisan-editor-desk-surface);
+  background-blend-mode: normal;
+  background-attachment: fixed;
+}
+
+body .workspace-ribbon.mod-left:before,
+.workspace-ribbon.mod-left:before {
+  top: 0;
+  left: 0;
+  width: var(--ribbon-width);
+  height: var(--header-height);
+  background-color: var(--smartisan-editor-desk-solid) !important;
+  background-image: var(--smartisan-editor-desk-surface) !important;
+  background-blend-mode: normal !important;
+  background-repeat: repeat !important;
+  background-attachment: fixed !important;
+  background-size: auto, auto, auto !important;
+  border: none !important;
+  border-bottom: none !important;
+  box-shadow: none !important;
+}
+
+.workspace-ribbon .sidebar-toggle-button,
+.workspace-ribbon.mod-left .sidebar-toggle-button,
+.sidebar-toggle-button.mod-left {
+  --tab-container-background: transparent;
+  top: 0;
+  background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+
+.sidebar-toggle-button .clickable-icon,
+.workspace-ribbon .sidebar-toggle-button .clickable-icon {
+  background-color: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+
+.sidebar-toggle-button .clickable-icon:hover,
+.workspace-ribbon .sidebar-toggle-button .clickable-icon:hover {
+  background-color: transparent;
+}
+
+/*
+ * Wood-desk chrome icons: hot-stamp / brand (烫印感).
+ * Ribbon, titlebar, side-dock icon tabs, vault bar only.
+ * Paper-area nav-header / plugin toolbars (calendar, file list, etc.) excluded.
+ */
+.theme-light .workspace-ribbon .side-dock-ribbon-action,
+.theme-light .workspace-ribbon .sidebar-toggle-button .clickable-icon,
+.theme-light .titlebar .clickable-icon,
+.theme-light .titlebar-button-container .clickable-icon,
+.theme-light .workspace-tabs.mod-top > .workspace-tab-header-container .clickable-icon,
+.theme-light .workspace-tabs.mod-top > .workspace-tab-header-container .view-action,
+.theme-light .workspace-split.mod-left-split .workspace-tabs.mod-top .workspace-tab-header,
+.theme-light .workspace-split.mod-right-split .workspace-tabs.mod-top .workspace-tab-header,
+.theme-light .workspace-split.mod-left-split .workspace-sidedock-vault-profile .clickable-icon,
+.theme-light .workspace-split.mod-right-split .workspace-sidedock-vault-profile .clickable-icon,
+.theme-light .workspace-split.mod-left-split .workspace-sidedock-vault-profile .workspace-drawer-vault-switcher-icon,
+.theme-light .workspace-split.mod-right-split .workspace-sidedock-vault-profile .workspace-drawer-vault-switcher-icon {
+  --icon-color: var(--smartisan-stamp-light-color);
+  color: var(--smartisan-stamp-light-color);
+}
+
+.theme-light .workspace-ribbon .side-dock-ribbon-action svg,
+.theme-light .workspace-ribbon .sidebar-toggle-button .clickable-icon svg,
+.theme-light .titlebar .clickable-icon svg,
+.theme-light .titlebar-button-container .clickable-icon svg,
+.theme-light .workspace-tabs.mod-top > .workspace-tab-header-container .clickable-icon svg,
+.theme-light .workspace-tabs.mod-top > .workspace-tab-header-container .view-action svg,
+.theme-light .workspace-split.mod-left-split .workspace-tabs.mod-top .workspace-tab-header svg,
+.theme-light .workspace-split.mod-right-split .workspace-tabs.mod-top .workspace-tab-header svg,
+.theme-light .workspace-split.mod-left-split .workspace-sidedock-vault-profile .clickable-icon svg,
+.theme-light .workspace-split.mod-right-split .workspace-sidedock-vault-profile .clickable-icon svg,
+.theme-light .workspace-split.mod-left-split .workspace-sidedock-vault-profile .workspace-drawer-vault-switcher-icon,
+.theme-light .workspace-split.mod-right-split .workspace-sidedock-vault-profile .workspace-drawer-vault-switcher-icon,
+.theme-light .workspace-split.mod-left-split .workspace-sidedock-vault-profile .workspace-drawer-vault-switcher-icon svg,
+.theme-light .workspace-split.mod-right-split .workspace-sidedock-vault-profile .workspace-drawer-vault-switcher-icon svg {
+  opacity: 0.9;
+  filter: var(--smartisan-stamp-light-filter);
+  transition: filter 0.15s ease, opacity 0.15s ease, color 0.15s ease;
+}
+
+.theme-light .workspace-ribbon .side-dock-ribbon-action:hover svg,
+.theme-light .workspace-ribbon .sidebar-toggle-button .clickable-icon:hover svg,
+.theme-light .workspace-ribbon .side-dock-ribbon-action.is-active svg,
+.theme-light .titlebar .clickable-icon:hover svg,
+.theme-light .titlebar-button-container .clickable-icon:hover svg,
+.theme-light .workspace-tabs.mod-top > .workspace-tab-header-container .clickable-icon:hover svg,
+.theme-light .workspace-tabs.mod-top > .workspace-tab-header-container .view-action:hover svg,
+.theme-light .workspace-tabs.mod-top > .workspace-tab-header-container .clickable-icon.is-active svg,
+.theme-light .workspace-split.mod-left-split .workspace-tabs.mod-top .workspace-tab-header:hover svg,
+.theme-light .workspace-split.mod-left-split .workspace-tabs.mod-top .workspace-tab-header.is-active svg,
+.theme-light .workspace-split.mod-right-split .workspace-tabs.mod-top .workspace-tab-header:hover svg,
+.theme-light .workspace-split.mod-right-split .workspace-tabs.mod-top .workspace-tab-header.is-active svg,
+.theme-light .workspace-split.mod-left-split .workspace-sidedock-vault-profile .clickable-icon:hover svg,
+.theme-light .workspace-split.mod-right-split .workspace-sidedock-vault-profile .clickable-icon:hover svg,
+.theme-light .workspace-split.mod-left-split .workspace-sidedock-vault-profile .workspace-drawer-vault-switcher-icon:hover,
+.theme-light .workspace-split.mod-right-split .workspace-sidedock-vault-profile .workspace-drawer-vault-switcher-icon:hover,
+.theme-light .workspace-split.mod-left-split .workspace-sidedock-vault-profile .workspace-drawer-vault-switcher-icon:hover svg,
+.theme-light .workspace-split.mod-right-split .workspace-sidedock-vault-profile .workspace-drawer-vault-switcher-icon:hover svg {
+  opacity: 1;
+  color: var(--smartisan-stamp-light-color-hover);
+  filter: var(--smartisan-stamp-light-filter-hover);
+}
+
+.theme-dark .workspace-ribbon .side-dock-ribbon-action,
+.theme-dark .workspace-ribbon .sidebar-toggle-button .clickable-icon,
+.theme-dark .titlebar .clickable-icon,
+.theme-dark .titlebar-button-container .clickable-icon,
+.theme-dark .workspace-tabs.mod-top > .workspace-tab-header-container .clickable-icon,
+.theme-dark .workspace-tabs.mod-top > .workspace-tab-header-container .view-action,
+.theme-dark .workspace-split.mod-left-split .workspace-tabs.mod-top .workspace-tab-header,
+.theme-dark .workspace-split.mod-right-split .workspace-tabs.mod-top .workspace-tab-header,
+.theme-dark .workspace-split.mod-left-split .workspace-sidedock-vault-profile .clickable-icon,
+.theme-dark .workspace-split.mod-right-split .workspace-sidedock-vault-profile .clickable-icon,
+.theme-dark .workspace-split.mod-left-split .workspace-sidedock-vault-profile .workspace-drawer-vault-switcher-icon,
+.theme-dark .workspace-split.mod-right-split .workspace-sidedock-vault-profile .workspace-drawer-vault-switcher-icon {
+  --icon-color: var(--smartisan-stamp-dark-color);
+  color: var(--smartisan-stamp-dark-color);
+}
+
+.theme-dark .workspace-ribbon .side-dock-ribbon-action svg,
+.theme-dark .workspace-ribbon .sidebar-toggle-button .clickable-icon svg,
+.theme-dark .titlebar .clickable-icon svg,
+.theme-dark .titlebar-button-container .clickable-icon svg,
+.theme-dark .workspace-tabs.mod-top > .workspace-tab-header-container .clickable-icon svg,
+.theme-dark .workspace-tabs.mod-top > .workspace-tab-header-container .view-action svg,
+.theme-dark .workspace-split.mod-left-split .workspace-tabs.mod-top .workspace-tab-header svg,
+.theme-dark .workspace-split.mod-right-split .workspace-tabs.mod-top .workspace-tab-header svg,
+.theme-dark .workspace-split.mod-left-split .workspace-sidedock-vault-profile .clickable-icon svg,
+.theme-dark .workspace-split.mod-right-split .workspace-sidedock-vault-profile .clickable-icon svg,
+.theme-dark .workspace-split.mod-left-split .workspace-sidedock-vault-profile .workspace-drawer-vault-switcher-icon,
+.theme-dark .workspace-split.mod-right-split .workspace-sidedock-vault-profile .workspace-drawer-vault-switcher-icon,
+.theme-dark .workspace-split.mod-left-split .workspace-sidedock-vault-profile .workspace-drawer-vault-switcher-icon svg,
+.theme-dark .workspace-split.mod-right-split .workspace-sidedock-vault-profile .workspace-drawer-vault-switcher-icon svg {
+  opacity: 0.92;
+  filter: var(--smartisan-stamp-dark-filter);
+  transition: filter 0.15s ease, opacity 0.15s ease, color 0.15s ease;
+}
+
+.theme-dark .workspace-ribbon .side-dock-ribbon-action:hover svg,
+.theme-dark .workspace-ribbon .sidebar-toggle-button .clickable-icon:hover svg,
+.theme-dark .workspace-ribbon .side-dock-ribbon-action.is-active svg,
+.theme-dark .titlebar .clickable-icon:hover svg,
+.theme-dark .titlebar-button-container .clickable-icon:hover svg,
+.theme-dark .workspace-tabs.mod-top > .workspace-tab-header-container .clickable-icon:hover svg,
+.theme-dark .workspace-tabs.mod-top > .workspace-tab-header-container .view-action:hover svg,
+.theme-dark .workspace-tabs.mod-top > .workspace-tab-header-container .clickable-icon.is-active svg,
+.theme-dark .workspace-split.mod-left-split .workspace-tabs.mod-top .workspace-tab-header:hover svg,
+.theme-dark .workspace-split.mod-left-split .workspace-tabs.mod-top .workspace-tab-header.is-active svg,
+.theme-dark .workspace-split.mod-right-split .workspace-tabs.mod-top .workspace-tab-header:hover svg,
+.theme-dark .workspace-split.mod-right-split .workspace-tabs.mod-top .workspace-tab-header.is-active svg,
+.theme-dark .workspace-split.mod-left-split .workspace-sidedock-vault-profile .clickable-icon:hover svg,
+.theme-dark .workspace-split.mod-right-split .workspace-sidedock-vault-profile .clickable-icon:hover svg,
+.theme-dark .workspace-split.mod-left-split .workspace-sidedock-vault-profile .workspace-drawer-vault-switcher-icon:hover,
+.theme-dark .workspace-split.mod-right-split .workspace-sidedock-vault-profile .workspace-drawer-vault-switcher-icon:hover,
+.theme-dark .workspace-split.mod-left-split .workspace-sidedock-vault-profile .workspace-drawer-vault-switcher-icon:hover svg,
+.theme-dark .workspace-split.mod-right-split .workspace-sidedock-vault-profile .workspace-drawer-vault-switcher-icon:hover svg {
+  opacity: 1;
+  color: var(--smartisan-stamp-dark-color-hover);
+  filter: var(--smartisan-stamp-dark-filter-hover);
+}
+
+/* Stamped chrome: no hover pill — stamp sits on bare wood */
+.workspace-ribbon .side-dock-ribbon-action,
+.workspace-ribbon .side-dock-ribbon-action:hover,
+.workspace-ribbon .side-dock-ribbon-action.is-active,
+.titlebar .clickable-icon,
+.titlebar .clickable-icon:hover,
+.titlebar-button-container .clickable-icon,
+.titlebar-button-container .clickable-icon:hover,
+.workspace-tabs.mod-top > .workspace-tab-header-container .clickable-icon,
+.workspace-tabs.mod-top > .workspace-tab-header-container .clickable-icon:hover,
+.workspace-tabs.mod-top > .workspace-tab-header-container .view-action,
+.workspace-tabs.mod-top > .workspace-tab-header-container .view-action:hover,
+.workspace-split.mod-left-split .workspace-tabs.mod-top .workspace-tab-header,
+.workspace-split.mod-left-split .workspace-tabs.mod-top .workspace-tab-header:hover,
+.workspace-split.mod-right-split .workspace-tabs.mod-top .workspace-tab-header,
+.workspace-split.mod-right-split .workspace-tabs.mod-top .workspace-tab-header:hover,
+.workspace-split.mod-left-split .workspace-sidedock-vault-profile .clickable-icon,
+.workspace-split.mod-left-split .workspace-sidedock-vault-profile .clickable-icon:hover,
+.workspace-split.mod-right-split .workspace-sidedock-vault-profile .clickable-icon,
+.workspace-split.mod-right-split .workspace-sidedock-vault-profile .clickable-icon:hover,
+.workspace-split.mod-left-split .workspace-sidedock-vault-profile .workspace-drawer-vault-switcher-icon,
+.workspace-split.mod-left-split .workspace-sidedock-vault-profile .workspace-drawer-vault-switcher-icon:hover,
+.workspace-split.mod-right-split .workspace-sidedock-vault-profile .workspace-drawer-vault-switcher-icon,
+.workspace-split.mod-right-split .workspace-sidedock-vault-profile .workspace-drawer-vault-switcher-icon:hover {
+  background-color: transparent !important;
+  box-shadow: none !important;
+}
+
+/*
+ * Paper inset nav toolbars (calendar-top-tools, file explorer nav, etc.):
+ * keep plain icons — no hot-stamp filter on beige paper.
+ */
+.workspace-split.mod-left-split .workspace-tab-container .nav-header .clickable-icon,
+.workspace-split.mod-right-split .workspace-tab-container .nav-header .clickable-icon,
+.workspace-split.mod-left-split .workspace-tab-container .nav-header .nav-action-button,
+.workspace-split.mod-right-split .workspace-tab-container .nav-header .nav-action-button {
+  --icon-color: var(--text-muted);
+  color: var(--text-muted);
+}
+
+.workspace-split.mod-left-split .workspace-tab-container .nav-header .clickable-icon svg,
+.workspace-split.mod-right-split .workspace-tab-container .nav-header .clickable-icon svg,
+.workspace-split.mod-left-split .workspace-tab-container .nav-header .nav-action-button svg,
+.workspace-split.mod-right-split .workspace-tab-container .nav-header .nav-action-button svg {
+  filter: none;
+  opacity: 1;
+}
+
+.workspace-split.mod-left-split .workspace-tab-container .nav-header .clickable-icon:hover,
+.workspace-split.mod-right-split .workspace-tab-container .nav-header .clickable-icon:hover,
+.workspace-split.mod-left-split .workspace-tab-container .nav-header .nav-action-button:hover,
+.workspace-split.mod-right-split .workspace-tab-container .nav-header .nav-action-button:hover {
+  --icon-color: var(--text-normal);
+  color: var(--text-normal);
+}
+
+.workspace-split.mod-left-split .workspace-tab-container .nav-header .clickable-icon:hover svg,
+.workspace-split.mod-right-split .workspace-tab-container .nav-header .clickable-icon:hover svg,
+.workspace-split.mod-left-split .workspace-tab-container .nav-header .nav-action-button:hover svg,
+.workspace-split.mod-right-split .workspace-tab-container .nav-header .nav-action-button:hover svg {
+  filter: none;
+  opacity: 1;
+}
+
+/* If toggle moves into the left dock tab strip, keep it chromeless too */
+.workspace-split.mod-left-split .sidebar-toggle-button,
+.workspace-split.mod-left-split .workspace-tab-header-container .sidebar-toggle-button {
+  --tab-container-background: transparent;
+  background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  box-shadow: none !important;
+}
+
+.is-hidden-frameless:not(.is-fullscreen):not(.mod-macos)
+  .workspace-tabs.mod-top-left-space
+  .workspace-tab-header-container:before,
+.is-hidden-frameless:not(.is-fullscreen):not(.mod-macos)
+  .workspace-tabs.mod-top-right-space
+  .workspace-tab-header-container:after {
+  background-color: transparent;
+  background-image: none;
+}
+
+.workspace-split.mod-left-split > .workspace-leaf-resize-handle,
+.workspace-split.mod-right-split > .workspace-leaf-resize-handle {
+  background-color: transparent;
+  border: none;
+  width: 4px;
+  box-shadow: none;
+}
+
+/*
+ * Soft rounded inset for side-dock content (file explorer / tags / etc.)
+ * Left: vault bar below tab paper → small bottom margin only.
+ * Right: no vault bar → full paper-bottom inset to match main editor card.
+ */
+.workspace-split.mod-left-split .workspace-tab-container {
+  margin: 0 var(--smartisan-dock-inset) var(--smartisan-dock-inset);
+  border-radius: var(--smartisan-paper-radius);
+  overflow: hidden;
+  border: none;
+  /* Remap fills so dock plugins using Obsidian tokens become glass */
+  --background-primary: transparent;
+  --background-primary-alt: transparent;
+  --background-secondary: transparent;
+  --background-secondary-alt: transparent;
+  background-color: var(--smartisan-paper-fill);
+  background-image: var(--smartisan-paper-surface);
+  background-size: var(--smartisan-paper-bg-size);
+  background-blend-mode: var(--smartisan-paper-bg-blend);
+  background-attachment: fixed;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.22) inset,
+    0 4px 14px rgba(61, 50, 41, 0.12);
+}
+
+.workspace-split.mod-right-split .workspace-tab-container {
+  margin: 0 var(--smartisan-dock-inset) var(--smartisan-side-paper-bottom-no-vault);
+  border-radius: var(--smartisan-paper-radius);
+  overflow: hidden;
+  border: none;
+  --background-primary: transparent;
+  --background-primary-alt: transparent;
+  --background-secondary: transparent;
+  --background-secondary-alt: transparent;
+  background-color: var(--smartisan-paper-fill);
+  background-image: var(--smartisan-paper-surface);
+  background-size: var(--smartisan-paper-bg-size);
+  background-blend-mode: var(--smartisan-paper-bg-blend);
+  background-attachment: fixed;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.22) inset,
+    0 4px 14px rgba(61, 50, 41, 0.12);
+}
+
+/* Left dock without vault bar is rare on desktop; default bottom inset
+ * matches the vault-present layout (dock-inset). Prefer not to use
+ * relational parent queries for review lint / performance. */
+
+/* Dark paper blend comes from --smartisan-paper-bg-blend on .theme-dark */
+
+/*
+ * Dark mode side docks: dissolve the floating paper card so the panel
+ * matches surrounding desk chrome. Prefer transparent (show parent desk)
+ * over opacity — opacity would also fade file names and icons.
+ * Gilt frame marks the content area on dark wood.
+ */
+.theme-dark .workspace-split.mod-left-split .workspace-tab-container,
+.theme-dark .workspace-split.mod-right-split .workspace-tab-container {
+  background-color: transparent;
+  background-image: none;
+  border: 1px solid var(--smartisan-gilt-frame-border);
+  box-shadow: var(--smartisan-gilt-frame-shadow-stack);
+}
+
+.workspace-split.mod-left-split .workspace-leaf-content,
+.workspace-split.mod-right-split .workspace-leaf-content {
+  border: none;
+  background: transparent;
+}
+
+.workspace-tab-header-container {
+  padding: 0;
+  gap: 4px;
+  align-items: center;
+  overflow: visible;
+}
+
+/* Icon buttons stay chromeless on wood — color comes from --icon-color / --tab-text-* */
+.side-dock-ribbon-action,
+.workspace-tab-header:not(.is-active),
+.nav-buttons-container .clickable-icon,
+.nav-buttons-container .nav-action-button,
+.view-header .clickable-icon,
+.view-header .view-action {
+  background-color: transparent;
+  border: none;
+  box-shadow: none;
+}
+
+.side-dock-ribbon-action:hover,
+.workspace-tab-header:not(.is-active):hover,
+.nav-buttons-container .clickable-icon:hover,
+.nav-buttons-container .nav-action-button:hover,
+.view-header .clickable-icon:hover,
+.view-header .view-action:hover {
+  background-color: var(--background-modifier-hover);
+}
+
+/*
+ * Tab bar: rounded headers on wood; active matches desk (transparent).
+ */
+.workspace-tab-header {
+  position: relative;
+  margin: 2px 2px 0;
+  border-radius: var(--tab-radius) !important;
+  border: none;
+  overflow: visible !important;
+  background: transparent !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+}
+
+.workspace-tab-header-inner {
+  position: relative;
+  border-radius: inherit;
+  background: transparent !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+}
+
+.workspace-tab-header.is-active,
+.workspace-tab-header.is-active .workspace-tab-header-inner {
+  border-radius: var(--tab-radius-active) !important;
+  background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  box-shadow: none !important;
+}
+
+/* Hide Obsidian folder-tab tail curves */
+.workspace-tab-header::before,
+.workspace-tab-header::after {
+  display: none !important;
+  content: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+/* Force transparent tab chip (Obsidian may paint inner from --tab-background-active) */
+.mod-root .workspace-tabs.mod-top .workspace-tab-header,
+.mod-root .workspace-tabs.mod-top .workspace-tab-header.is-active,
+.mod-root .workspace-tabs.mod-top .workspace-tab-header.is-active .workspace-tab-header-inner {
+  --tab-background-active: transparent;
+  background-color: transparent !important;
+}
+
+/* ========== Side panels ========== */
+/*
+ * Vault switcher: no dedicated Obsidian token.
+ * Make the bar transparent so the left-split / workspace-tabs wood shows through
+ * (same surface as the ribbon). Also remap local background tokens Obsidian
+ * reads for this control, so default primary/secondary paint cannot reappear.
+ */
+/*
+ * Vault bar sits on wood under the paper list.
+ * Keep a matching bottom inset so the whole left dock bottom
+ * lines up with the main editor paper bottom.
+ */
+/*
+ * Vault bar sits on desk under the paper list.
+ * Light desk → bronze nameplate + stamp icons; dark desk → gilt.
+ */
+body.theme-light:not(.is-mobile) .workspace-split.mod-left-split .workspace-sidedock-vault-profile,
+body.theme-light:not(.is-mobile) .workspace-split.mod-right-split .workspace-sidedock-vault-profile,
+body.theme-light .workspace-split.mod-left-split .workspace-sidedock-vault-profile,
+body.theme-light .workspace-split.mod-right-split .workspace-sidedock-vault-profile {
+  --background-primary: transparent;
+  --background-primary-alt: transparent;
+  --background-secondary: transparent;
+  --background-secondary-alt: transparent;
+  --background-modifier-hover: rgba(92, 64, 51, 0.1);
+  --vault-profile-color: var(--smartisan-ink);
+  --vault-profile-color-hover: var(--smartisan-wood-dark);
+  --text-normal: var(--smartisan-ink);
+  --text-muted: var(--smartisan-ink-muted);
+  --text-faint: var(--smartisan-ink-faint);
+  --icon-color: var(--smartisan-stamp-light-color);
+  --icon-color-hover: var(--smartisan-stamp-light-color-hover);
+  --smartisan-vault-name-color: var(--smartisan-vault-name-bronze);
+  --smartisan-vault-name-color-hover: var(--smartisan-vault-name-bronze-hover);
+  --smartisan-vault-name-shadow: var(--smartisan-vault-name-bronze-shadow);
+  --smartisan-vault-name-shadow-hover: var(--smartisan-vault-name-bronze-shadow-hover);
+  --smartisan-vault-name-rule: var(--smartisan-vault-name-bronze-rule);
+  color: var(--smartisan-ink);
+  background: transparent;
+  background-color: transparent;
+  background-image: none;
+  border: none;
+  border-top: none;
+  box-shadow: none;
+  margin: 0 var(--smartisan-dock-inset) var(--smartisan-dock-inset);
+}
+
+body.theme-dark:not(.is-mobile) .workspace-split.mod-left-split .workspace-sidedock-vault-profile,
+body.theme-dark:not(.is-mobile) .workspace-split.mod-right-split .workspace-sidedock-vault-profile,
+body.theme-dark .workspace-split.mod-left-split .workspace-sidedock-vault-profile,
+body.theme-dark .workspace-split.mod-right-split .workspace-sidedock-vault-profile {
+  --background-primary: transparent;
+  --background-primary-alt: transparent;
+  --background-secondary: transparent;
+  --background-secondary-alt: transparent;
+  --background-modifier-hover: rgba(212, 184, 120, 0.16);
+  --vault-profile-color: var(--smartisan-gilt);
+  --vault-profile-color-hover: var(--smartisan-gilt-bright);
+  --text-normal: var(--smartisan-gilt);
+  --text-muted: var(--smartisan-gilt-muted);
+  --text-faint: var(--smartisan-gilt-muted);
+  --icon-color: var(--smartisan-stamp-dark-color);
+  --icon-color-hover: var(--smartisan-stamp-dark-color-hover);
+  --smartisan-vault-name-color: var(--smartisan-gilt);
+  --smartisan-vault-name-color-hover: var(--smartisan-gilt-bright);
+  --smartisan-vault-name-shadow:
+    0 1px 0 rgba(0, 0, 0, 0.52),
+    0 -0.5px 0 rgba(232, 208, 160, 0.38),
+    0 0 2px rgba(201, 166, 107, 0.22);
+  --smartisan-vault-name-shadow-hover:
+    0 1px 0 rgba(0, 0, 0, 0.58),
+    0 -0.5px 0 rgba(255, 236, 200, 0.42),
+    0 0 3px rgba(232, 208, 160, 0.3);
+  --smartisan-vault-name-rule: rgba(212, 184, 120, 0.34);
+  color: var(--smartisan-gilt);
+  background: transparent;
+  background-color: transparent;
+  background-image: none;
+  border: none;
+  border-top: none;
+  box-shadow: none;
+  margin: 0 var(--smartisan-dock-inset) var(--smartisan-dock-inset);
+}
+
+/* Fixed vault bar height — keeps side-dock paper bottom aligned with main paper */
+.workspace-split.mod-left-split .workspace-sidedock-vault-profile,
+.workspace-split.mod-right-split .workspace-sidedock-vault-profile {
+  box-sizing: border-box;
+  height: var(--smartisan-vault-profile-height);
+  min-height: var(--smartisan-vault-profile-height);
+  max-height: var(--smartisan-vault-profile-height);
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+}
+
+body:not(.is-mobile)
+  .workspace-split.mod-left-split
+  .workspace-sidedock-vault-profile
+  .workspace-drawer-vault-switcher,
+body:not(.is-mobile)
+  .workspace-split.mod-right-split
+  .workspace-sidedock-vault-profile
+  .workspace-drawer-vault-switcher,
+body
+  .workspace-split.mod-left-split
+  .workspace-sidedock-vault-profile
+  .workspace-drawer-vault-switcher,
+body
+  .workspace-split.mod-right-split
+  .workspace-sidedock-vault-profile
+  .workspace-drawer-vault-switcher {
+  color: var(--vault-profile-color);
+  background: transparent;
+  background-color: transparent;
+  box-shadow: none;
+  border: none;
+  align-items: center;
+  gap: 6px;
+  padding: 0 4px;
+  min-height: 0;
+  height: 100%;
+  flex: 1 1 auto;
+}
+
+/*
+ * Vault name: wood nameplate — serif, tracked, deboss/stamp shadow, rule frame.
+ */
+body .workspace-split.mod-left-split .workspace-sidedock-vault-profile .workspace-drawer-vault-name,
+body .workspace-split.mod-right-split .workspace-sidedock-vault-profile .workspace-drawer-vault-name {
+  position: relative;
+  display: block;
+  flex: 1 1 auto;
+  min-width: 0;
+  max-width: 100%;
+  margin: 0;
+  padding:
+    var(--smartisan-vault-name-pad-block)
+    var(--smartisan-vault-name-pad-inline)
+    calc(var(--smartisan-vault-name-pad-block) - 2px);
+  font-family: var(--smartisan-vault-name-font);
+  font-size: var(--smartisan-vault-name-size);
+  font-weight: var(--smartisan-vault-name-weight);
+  font-style: normal;
+  line-height: 1.35;
+  letter-spacing: var(--smartisan-vault-name-tracking);
+  text-align: center;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  color: var(--smartisan-vault-name-color, var(--vault-profile-color));
+  text-shadow: var(--smartisan-vault-name-shadow, none);
+  transition:
+    color 0.15s ease,
+    text-shadow 0.15s ease,
+    opacity 0.15s ease;
+}
+
+body .workspace-split.mod-left-split .workspace-sidedock-vault-profile .workspace-drawer-vault-name::before,
+body .workspace-split.mod-right-split .workspace-sidedock-vault-profile .workspace-drawer-vault-name::before,
+body .workspace-split.mod-left-split .workspace-sidedock-vault-profile .workspace-drawer-vault-name::after,
+body .workspace-split.mod-right-split .workspace-sidedock-vault-profile .workspace-drawer-vault-name::after {
+  content: "";
+  position: absolute;
+  left: var(--smartisan-vault-name-rule-inset);
+  right: var(--smartisan-vault-name-rule-inset);
+  height: 1px;
+  pointer-events: none;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--smartisan-vault-name-rule, rgba(92, 64, 51, 0.28)) 18%,
+    var(--smartisan-vault-name-rule, rgba(92, 64, 51, 0.28)) 82%,
+    transparent 100%
+  );
+}
+
+body .workspace-split.mod-left-split .workspace-sidedock-vault-profile .workspace-drawer-vault-name::before,
+body .workspace-split.mod-right-split .workspace-sidedock-vault-profile .workspace-drawer-vault-name::before {
+  top: 0;
+}
+
+body .workspace-split.mod-left-split .workspace-sidedock-vault-profile .workspace-drawer-vault-name::after,
+body .workspace-split.mod-right-split .workspace-sidedock-vault-profile .workspace-drawer-vault-name::after {
+  bottom: 0;
+}
+
+body .workspace-split.mod-left-split .workspace-sidedock-vault-profile .workspace-drawer-vault-switcher:hover .workspace-drawer-vault-name,
+body .workspace-split.mod-right-split .workspace-sidedock-vault-profile .workspace-drawer-vault-switcher:hover .workspace-drawer-vault-name,
+body .workspace-split.mod-left-split .workspace-sidedock-vault-profile .workspace-drawer-vault-switcher:focus-visible .workspace-drawer-vault-name,
+body .workspace-split.mod-right-split .workspace-sidedock-vault-profile .workspace-drawer-vault-switcher:focus-visible .workspace-drawer-vault-name {
+  color: var(--smartisan-vault-name-color-hover, var(--vault-profile-color-hover));
+  text-shadow: var(--smartisan-vault-name-shadow-hover, var(--smartisan-vault-name-shadow, none));
+}
+
+body:not(.is-mobile)
+  .workspace-split.mod-left-split
+  .workspace-sidedock-vault-profile
+  .workspace-drawer-vault-name,
+body:not(.is-mobile)
+  .workspace-split.mod-right-split
+  .workspace-sidedock-vault-profile
+  .workspace-drawer-vault-name {
+  color: var(--smartisan-vault-name-color, var(--vault-profile-color));
+}
+
+body:not(.is-mobile)
+  .workspace-split.mod-left-split
+  .workspace-sidedock-vault-profile
+  .workspace-drawer-vault-switcher-icon,
+body:not(.is-mobile)
+  .workspace-split.mod-right-split
+  .workspace-sidedock-vault-profile
+  .workspace-drawer-vault-switcher-icon,
+body .workspace-split.mod-left-split .workspace-sidedock-vault-profile .clickable-icon,
+body .workspace-split.mod-right-split .workspace-sidedock-vault-profile .clickable-icon {
+  color: var(--icon-color);
+  background: transparent;
+  background-color: transparent;
+  box-shadow: none;
+  border: none;
+}
+
+.nav-header {
+  background: transparent;
+}
+
+.nav-buttons-container {
+  background: transparent;
+  border-radius: 0;
+  gap: 2px;
+}
+
+/* Side panel view header blends into wood panel */
+.workspace-split.mod-left-split .view-header,
+.workspace-split.mod-right-split .view-header {
+  background: transparent;
+  border-bottom: none;
+}
+
+.workspace-split.mod-left-split .view-content,
+.workspace-split.mod-right-split .view-content {
+  background: transparent;
+  border: none;
+}
+
+/* Remove tree / file / tag vertical guide lines */
+.nav-folder-children,
+.tree-item-children,
+.nav-folder.is-collapsed > .nav-folder-children,
+.tag-pane-tag,
+.workspace-leaf-content[data-type="file-explorer"] .tree-item-children,
+.workspace-leaf-content[data-type="tag"] .tree-item-children,
+.workspace-leaf-content[data-type="outline"] .tree-item-children,
+.workspace-leaf-content[data-type="bookmarks"] .tree-item-children {
+  border-left: none !important;
+  border-right: none !important;
+  box-shadow: none;
+}
+
+.nav-indentation-guide,
+.tree-item-indentation-guide,
+.indentation-guide {
+  display: none;
+  width: 0;
+  border: none;
+  background: transparent;
+}
+
+/* Search / filter bar: container only — input styled after form-field rules below.
+ * Do not pad the container: Obsidian centers ::before via --input-height from
+ * the container top; inner padding shifts the input without moving the icon. */
+.search-input-container {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  padding: 0;
+  margin: 4px 8px;
+}
+
+/* ========== Side panel lists (file explorer, tags, outline, bookmarks, search) ========== */
+.nav-files-container,
+.outline,
+.bookmark-container,
+.tag-container,
+.search-results,
+.backlink-pane,
+.outgoing-link-pane {
+  padding: 2px 6px 10px;
+  background: transparent;
+}
+
+.nav-file,
+.nav-folder,
+.tree-item {
+  margin-bottom: 0;
+}
+
+/* List rows blend into wood — hover/active only, no paper strips */
+.nav-file-title,
+.nav-folder-title,
+.tree-item-self {
+  position: relative;
+  margin-inline: 2px;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-right: var(--size-4-2);
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  border-radius: var(--radius-s);
+}
+
+.nav-file-title:hover,
+.nav-folder-title:hover,
+.tree-item-self:hover {
+  background: var(--nav-item-background-hover);
+  box-shadow: none;
+}
+
+.nav-file-title.is-active,
+.nav-folder-title.is-active,
+.tree-item-self.is-selected,
+.tree-item-self.is-active {
+  background: var(--nav-item-background-active);
+  box-shadow: none;
+}
+
+.nav-file-title-content,
+.nav-folder-title-content,
+.tree-item-inner {
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ========== Center content: global floating paper card ==========
+ * Shared geometry tokens (--smartisan-paper-*).
+ * Inset is padding on the leaf (not margin on width:100% header/content),
+ * so the card never overflows and "sticks out" on the right.
+ * Header + .view-content paint the SAME paper with fixed attachment.
+ * Bottom radius + overflow:hidden on .view-content clips plugin hosts.
+ * Graph: seamless editor desk (same surface as window frame — no paper card).
+ */
+.mod-root .workspace-leaf-content {
+  background-color: var(--smartisan-editor-desk-solid);
+  background-image: var(--smartisan-editor-desk-surface);
+  background-attachment: fixed;
+}
+
+.mod-root
+  .workspace-leaf-content:not([data-type="graph"]):not([data-type="localgraph"]) {
+  padding-top: var(--smartisan-paper-top-inset);
+  padding-inline: var(--smartisan-paper-inline-inset);
+  padding-bottom: var(--smartisan-paper-bottom-inset);
+  box-sizing: border-box;
+}
+
+.mod-root
+  .workspace-leaf-content:not([data-type="graph"]):not([data-type="localgraph"])
+  .view-header {
+  /*
+   * Paint paper with --smartisan-paper-fill (not remapped tokens).
+   * Remap primary/secondary so children that use Obsidian fill tokens go glass.
+   */
+  --background-primary: transparent;
+  --background-primary-alt: transparent;
+  --background-secondary: transparent;
+  --background-secondary-alt: transparent;
+  margin: 0;
+  width: auto;
+  max-width: none;
+  border-radius: var(--smartisan-paper-radius) var(--smartisan-paper-radius) 0 0;
+  border-bottom: none;
+  color: var(--text-normal);
+  background-color: var(--smartisan-paper-fill);
+  background-image: var(--smartisan-paper-surface);
+  background-blend-mode: var(--smartisan-paper-bg-blend);
+  background-size: var(--smartisan-paper-bg-size);
+  /* fixed = header & content share one continuous texture map */
+  background-attachment: fixed;
+  box-shadow: none;
+}
+
+.mod-root
+  .workspace-leaf-content:not([data-type="graph"]):not([data-type="localgraph"])
+  .view-header-title-container,
+.mod-root
+  .workspace-leaf-content:not([data-type="graph"]):not([data-type="localgraph"])
+  .view-header-nav-buttons,
+.mod-root
+  .workspace-leaf-content:not([data-type="graph"]):not([data-type="localgraph"])
+  .view-header-title-parent,
+.mod-root
+  .workspace-leaf-content:not([data-type="graph"]):not([data-type="localgraph"])
+  .view-header-title-wrapper,
+.mod-root
+  .workspace-leaf-content:not([data-type="graph"]):not([data-type="localgraph"])
+  .view-header-breadcrumb {
+  background: transparent;
+  background-image: none;
+  box-shadow: none;
+}
+
+.mod-root
+  .workspace-leaf-content:not([data-type="graph"]):not([data-type="localgraph"])
+  .view-header
+  .clickable-icon:hover,
+.mod-root
+  .workspace-leaf-content:not([data-type="graph"]):not([data-type="localgraph"])
+  .view-header
+  .view-action:hover {
+  background-color: var(--background-modifier-hover);
+  color: var(--icon-color-hover);
+}
+
+.mod-root
+  .workspace-leaf-content:not([data-type="graph"]):not([data-type="localgraph"]):not([data-type="canvas"])
+  .view-content {
+  --background-primary: transparent;
+  --background-primary-alt: transparent;
+  --background-secondary: transparent;
+  --background-secondary-alt: transparent;
+  margin: 0;
+  width: auto;
+  max-width: none;
+  padding: 0;
+  box-sizing: border-box;
+  border-radius: 0 0 var(--smartisan-paper-radius) var(--smartisan-paper-radius);
+  background-color: var(--smartisan-paper-fill);
+  background-image: var(--smartisan-paper-surface);
+  background-blend-mode: var(--smartisan-paper-bg-blend);
+  background-size: var(--smartisan-paper-bg-size);
+  background-attachment: fixed;
+  box-shadow: var(--smartisan-paper-lift-shadow);
+  overflow: hidden;
+}
+
+/*
+ * Dark mode main content card: same gilt frame + transparent shell as side docks.
+ * Header + content share one frame; graph stays on editor desk (no extra wood layer).
+ */
+.theme-dark
+  .mod-root
+  .workspace-leaf-content:not([data-type="graph"]):not([data-type="localgraph"])
+  .view-header,
+.theme-dark
+  .mod-root
+  .workspace-leaf-content:not([data-type="graph"]):not([data-type="localgraph"])
+  .view-content {
+  background-color: transparent;
+  background-image: none;
+}
+
+.theme-dark
+  .mod-root
+  .workspace-leaf-content:not([data-type="graph"]):not([data-type="localgraph"])
+  .view-header {
+  border: 1px solid var(--smartisan-gilt-frame-border);
+  border-bottom: none;
+  box-shadow: inset 0 1px 0 var(--smartisan-gilt-frame-highlight);
+}
+
+.theme-dark
+  .mod-root
+  .workspace-leaf-content:not([data-type="graph"]):not([data-type="localgraph"])
+  .view-content {
+  border: 1px solid var(--smartisan-gilt-frame-border);
+  border-top: none;
+  box-shadow:
+    0 0 0 1px var(--smartisan-gilt-frame-outer),
+    inset 0 -1px 0 var(--smartisan-gilt-frame-shadow),
+    0 0 14px var(--smartisan-gilt-frame-glow);
+}
+
+.theme-dark .mod-root .workspace-leaf-content[data-type="canvas"] {
+  --canvas-background: transparent;
+}
+
+/* Canvas: same paper shell, but keep real fill tokens for menus / picker / edges */
+.mod-root .workspace-leaf-content[data-type="canvas"] .view-content {
+  --background-primary: var(--smartisan-canvas-card-fill);
+  --background-primary-alt: var(--color-base-05);
+  --background-secondary: var(--color-base-10);
+  --background-secondary-alt: var(--color-base-20);
+  margin: 0;
+  width: auto;
+  max-width: none;
+  padding: 0;
+  box-sizing: border-box;
+  border-radius: 0 0 var(--smartisan-paper-radius) var(--smartisan-paper-radius);
+  background-color: var(--smartisan-paper-fill);
+  background-image: var(--smartisan-paper-surface);
+  background-blend-mode: var(--smartisan-paper-bg-blend);
+  background-size: var(--smartisan-paper-bg-size);
+  background-attachment: fixed;
+  box-shadow: var(--smartisan-paper-lift-shadow);
+  overflow: hidden;
+}
+
+/*
+ * Paper glass — conservative universal approach (no per-plugin patches):
+ * 1) Remap Obsidian fill tokens to transparent on the paper shell (above).
+ * 2) Clear only shallow host background-COLOR so full-bleed wrappers go glass.
+ * Never set background-image: none — that would wipe deck covers, gradients,
+ * scrims, and other intentional imagery (e.g. Weave 牌组卡).
+ * No !important: plugin/component styles for cards keep winning.
+ */
+.mod-root
+  .workspace-leaf-content:not([data-type="graph"]):not([data-type="localgraph"]):not([data-type="canvas"])
+  .view-content
+  > *,
+.mod-root
+  .workspace-leaf-content:not([data-type="graph"]):not([data-type="localgraph"]):not([data-type="canvas"])
+  .view-content
+  > * > *,
+.workspace-split.mod-left-split .workspace-tab-container .view-content > *,
+.workspace-split.mod-left-split .workspace-tab-container .view-content > * > *,
+.workspace-split.mod-right-split .workspace-tab-container .view-content > *,
+.workspace-split.mod-right-split .workspace-tab-container .view-content > * > * {
+  background-color: transparent;
+}
+
+/* Nested paper hosts: no second card / radius / shadow */
+.mod-root
+  .workspace-leaf-content:not([data-type="graph"]):not([data-type="localgraph"])
+  .view-content
+  .view-content {
+  margin: 0;
+  padding: 0;
+  border-radius: 0;
+  box-shadow: none;
+  overflow: visible;
+}
+
+.mod-root .workspace-leaf-content[data-type="markdown"] .markdown-source-view,
+.mod-root .workspace-leaf-content[data-type="markdown"] .markdown-reading-view {
+  position: relative;
+  height: 100%;
+  min-height: 0;
+  box-sizing: border-box;
+  border-radius: 0;
+  background: transparent;
+  background-image: none;
+  box-shadow: none;
+  overflow: hidden;
+}
+
+/* ========== Markdown views (plain sheet; canvas cards excluded below) ========== */
+.markdown-source-view.mod-cm6 .cm-scroller,
+.markdown-preview-view {
+  background-color: transparent;
+  background-image: none;
+}
+
+.markdown-source-view.mod-cm6 .cm-scroller {
+  padding-top: 8px;
+}
+
+.markdown-preview-view {
+  padding-top: 12px;
+}
+
+/*
+ * Canvas cards: plain sheet.
+ * Preview lives under .canvas-node; edit mode is .mod-inside-iframe (no .canvas-node ancestor).
+ */
+.mod-root .workspace-leaf-content[data-type="canvas"] .canvas-node .markdown-preview-view,
+.mod-root .workspace-leaf-content[data-type="canvas"] .canvas-node .markdown-source-view.mod-cm6 .cm-scroller,
+.markdown-source-view.mod-inside-iframe .cm-scroller,
+.markdown-source-view.mod-inside-iframe.mod-cm6 .cm-scroller {
+  background-color: transparent;
+  background-image: none;
+}
+
+/*
+ * Canvas iframe editor: fully transparent so the card container/content
+ * fill shows through — preview and edit share one background.
+ */
+.markdown-source-view.mod-inside-iframe {
+  --background-primary: transparent;
+  --background-primary-alt: transparent;
+  background-color: transparent;
+}
+
+.markdown-source-view.mod-inside-iframe .cm-editor,
+.markdown-source-view.mod-inside-iframe .cm-scroller,
+.markdown-source-view.mod-inside-iframe .cm-gutters,
+.markdown-source-view.mod-inside-iframe .cm-content {
+  background-color: transparent !important;
+  background-image: none !important;
+}
+
+.markdown-source-view.mod-cm6 .cm-content,
+.markdown-source-view.mod-cm6 .cm-line {
+  line-height: var(--line-height-normal);
+}
+
+.markdown-preview-view p,
+.markdown-preview-view li {
+  line-height: var(--line-height-normal);
+}
+
+/* Editor selection & active line */
+.markdown-source-view.mod-cm6 .cm-selectionBackground,
+.markdown-source-view.mod-cm6 .cm-content ::selection {
+  background-color: var(--text-selection);
+}
+
+.markdown-source-view.mod-cm6 .cm-activeLine {
+  background-color: rgba(201, 166, 107, 0.1);
+}
+
+.theme-dark .markdown-source-view.mod-cm6 .cm-activeLine {
+  background-color: rgba(201, 166, 107, 0.08);
+}
+
+.markdown-source-view.mod-cm6 .cm-cursor,
+.markdown-source-view.mod-cm6 .cm-dropCursor {
+  border-left-color: var(--caret-color);
+}
+
+/*
+ * Horizontal rule (---) · 线装册页 · 中心订点 (scheme B).
+ * Preview + Live Preview only; Canvas cards and iframe editors stay plain.
+ */
+.markdown-preview-view hr,
+.markdown-source-view.mod-cm6.is-live-preview hr,
+.markdown-reading-view hr {
+  border: none;
+  height: 20px;
+  margin: 1.4em var(--smartisan-hr-rule-inset);
+  position: relative;
+  background: none;
+  overflow: visible;
+}
+
+.markdown-preview-view hr::before,
+.markdown-source-view.mod-cm6.is-live-preview hr::before,
+.markdown-reading-view hr::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 1px;
+  transform: translateY(-50%);
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    color-mix(in srgb, var(--smartisan-accent) 70%, var(--smartisan-ink)) 12%,
+    color-mix(in srgb, var(--smartisan-accent) 70%, var(--smartisan-ink)) 88%,
+    transparent 100%
+  );
+  filter: drop-shadow(0 1px 0 rgba(232, 208, 160, 0.35));
+}
+
+.theme-dark .markdown-preview-view hr::before,
+.theme-dark .markdown-source-view.mod-cm6.is-live-preview hr::before,
+.theme-dark .markdown-reading-view hr::before {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    color-mix(in srgb, var(--smartisan-gilt) 75%, transparent) 12%,
+    color-mix(in srgb, var(--smartisan-gilt) 75%, transparent) 88%,
+    transparent 100%
+  );
+  filter: drop-shadow(0 1px 0 rgba(212, 184, 120, 0.2));
+}
+
+.markdown-preview-view hr::after,
+.markdown-source-view.mod-cm6.is-live-preview hr::after,
+.markdown-reading-view hr::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%) rotate(45deg);
+  width: var(--smartisan-hr-stitch-size);
+  height: var(--smartisan-hr-stitch-size);
+  background: var(--smartisan-paper-fill);
+  border: var(--smartisan-hr-stitch-border) solid var(--smartisan-accent);
+  box-shadow: 0 0 0 2px var(--smartisan-paper-fill);
+}
+
+.theme-dark .markdown-preview-view hr::after,
+.theme-dark .markdown-source-view.mod-cm6.is-live-preview hr::after,
+.theme-dark .markdown-reading-view hr::after {
+  border-color: var(--smartisan-gilt);
+  box-shadow:
+    0 0 0 2px var(--smartisan-paper-fill),
+    0 0 6px rgba(212, 184, 120, 0.25);
+}
+
+.mod-root .workspace-leaf-content[data-type="canvas"] .canvas-node .markdown-preview-view hr,
+.mod-root .workspace-leaf-content[data-type="canvas"] .canvas-node .markdown-source-view.mod-cm6.is-live-preview hr,
+.markdown-source-view.mod-inside-iframe hr {
+  height: auto;
+  margin: var(--p-spacing) 0;
+  border: none;
+  border-top: var(--hr-thickness) solid var(--hr-color);
+  background: none;
+  overflow: visible;
+}
+
+.mod-root .workspace-leaf-content[data-type="canvas"] .canvas-node .markdown-preview-view hr::before,
+.mod-root .workspace-leaf-content[data-type="canvas"] .canvas-node .markdown-preview-view hr::after,
+.mod-root .workspace-leaf-content[data-type="canvas"] .canvas-node .markdown-source-view.mod-cm6.is-live-preview hr::before,
+.mod-root .workspace-leaf-content[data-type="canvas"] .canvas-node .markdown-source-view.mod-cm6.is-live-preview hr::after,
+.markdown-source-view.mod-inside-iframe hr::before,
+.markdown-source-view.mod-inside-iframe hr::after {
+  content: none;
+}
+
+/* Reading title — magazine feel */
+.markdown-preview-view .mod-header .inline-title,
+.markdown-reading-view .inline-title {
+  text-align: center;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.markdown-preview-view h1:first-child {
+  text-align: center;
+  margin-top: 0.4em;
+}
+
+.markdown-preview-view h1,
+.markdown-preview-view h2,
+.cm-header-1,
+.cm-header-2 {
+  letter-spacing: 0.02em;
+}
+
+/* Properties stay horizontal; kill Obsidian hover/focus chrome on keys */
+.metadata-container,
+.metadata-property,
+.metadata-property-key,
+.metadata-property-value {
+  writing-mode: horizontal-tb;
+  max-width: none;
+}
+
+.metadata-container {
+  --background-modifier-hover: transparent;
+  --background-modifier-form-field: transparent;
+  --metadata-property-box-shadow: none;
+  --metadata-property-box-shadow-hover: none;
+  --metadata-property-box-shadow-focus: none;
+  --metadata-label-background: transparent;
+  --metadata-label-background-hover: transparent;
+  --metadata-label-background-active: transparent;
+  --metadata-property-background: transparent;
+  --metadata-property-background-hover: transparent;
+  --metadata-property-background-active: transparent;
+  --metadata-input-background: transparent;
+  --metadata-input-background-hover: transparent;
+  --metadata-input-background-active: transparent;
+}
+
+.metadata-property,
+.metadata-property.has-focus,
+.metadata-property:focus-within {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  flex-wrap: wrap;
+  background: transparent;
+  background-color: transparent;
+  box-shadow: none;
+}
+
+.metadata-property-key,
+.metadata-property-key:focus-within,
+.metadata-property-value,
+.metadata-property-value:focus-within {
+  background: transparent;
+  background-color: transparent;
+  box-shadow: none;
+  border-bottom-color: transparent;
+}
+
+@media (hover: hover) {
+  .metadata-property:hover {
+    background: transparent;
+    background-color: transparent;
+    box-shadow: none;
+  }
+
+  .metadata-property-key:hover,
+  .metadata-property-value:hover {
+    background: transparent;
+    background-color: transparent;
+  }
+}
+
+/* ========== Modals / command palette / popovers ==========
+ * Light: paper shell (matches content card).
+ * Dark: floating panels must paint the same desk surface as the main
+ * content leaf — there is no parent desk under a modal — then go glass
+ * + gilt frame so settings chrome matches the content area.
+ */
+.modal,
+.prompt,
+.suggestion-container,
+.menu,
+.popover.hover-popover {
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-l);
+  background-color: var(--background-primary);
+  background-image: var(--smartisan-paper-surface);
+  background-size: var(--smartisan-paper-bg-size);
+  background-blend-mode: var(--smartisan-paper-bg-blend);
+  box-shadow: var(--shadow-l);
+}
+
+.prompt {
+  position: relative;
+}
+
+.modal-bg {
+  background-color: var(--background-modifier-cover);
+}
+
+/*
+ * Dark floating shells = editor desk (same as .mod-root leaf frame)
+ * with gilt frame tokens shared by side docks / main content card.
+ * Remap Obsidian 1.13+ modal/settings tokens — they paint opaque cards
+ * (.setting-items, .setting-page-titlebar, etc.) via --setting-items-background
+ * and --modal-background, not only --background-primary.
+ */
+.theme-dark .modal,
+.theme-dark .modal.mod-settings,
+.theme-dark .modal.mod-sidebar-layout,
+.theme-dark .modal.mod-community-modal,
+.theme-dark .modal.mod-community-theme,
+.theme-dark .modal.mod-community-plugin,
+.theme-dark .prompt,
+.theme-dark .suggestion-container,
+.theme-dark .cm-tooltip.cm-tooltip-autocomplete {
+  --background-primary: transparent;
+  --background-primary-alt: transparent;
+  --background-secondary: transparent;
+  --background-secondary-alt: transparent;
+  --modal-background: transparent;
+  --modal-sidebar-background: transparent;
+  --settings-background: transparent;
+  --settings-home-background: transparent;
+  --setting-items-background: transparent;
+  background-color: var(--smartisan-editor-desk-solid);
+  background-image: var(--smartisan-editor-desk-surface);
+  background-size: auto;
+  background-blend-mode: normal;
+  background-attachment: fixed;
+  border: 1px solid var(--smartisan-gilt-frame-border);
+  box-shadow:
+    var(--smartisan-gilt-frame-shadow-stack),
+    var(--shadow-l);
+}
+
+/* Settings / modal chrome: dissolve opaque regions so desk texture shows */
+.theme-dark .modal .modal-content,
+.theme-dark .modal .modal-title,
+.theme-dark .modal .modal-header,
+.theme-dark .modal .modal-close-button,
+.theme-dark .modal .modal-sidebar,
+.theme-dark .modal .vertical-tabs-container,
+.theme-dark .modal .vertical-tab-header,
+.theme-dark .modal .vertical-tab-content-container,
+.theme-dark .modal .vertical-tab-content,
+.theme-dark .modal .horizontal-tab-content,
+.theme-dark .modal .vertical-tab-header-group,
+.theme-dark .modal .vertical-tab-header-group-title,
+.theme-dark .modal .setting-page-titlebar,
+.theme-dark .modal .modal-setting-titlebar,
+.theme-dark .modal .setting-group .setting-group-search,
+.theme-dark .modal .setting-group .setting-items,
+.theme-dark .modal .community-modal-search-results-wrapper,
+.theme-dark .modal .community-modal-search-results-status-content,
+.theme-dark .modal .community-modal-details,
+.theme-dark .modal .community-modal-info {
+  background: transparent;
+  background-color: transparent;
+  background-image: none;
+  box-shadow: none;
+}
+
+.theme-dark .modal .vertical-tab-header {
+  border-right: 1px solid var(--smartisan-gilt-frame-border);
+}
+
+.theme-dark .modal .vertical-tab-nav-item.is-active {
+  background: var(--background-modifier-hover);
+  box-shadow: none;
+}
+
+.prompt-input,
+input[type="text"]:not(.metadata-property-key-input):not(.metadata-input-text):not(.metadata-input-number),
+input[type="search"],
+input[type="number"]:not(.metadata-input-number),
+textarea:not(.metadata-input-longtext) {
+  border-radius: var(--input-radius);
+  border: 1px solid var(--background-modifier-border);
+  background-color: var(--background-modifier-form-field);
+}
+
+/*
+ * Dropdowns: never use background shorthand — it resets repeat to repeat,
+ * then Obsidian's .theme-dark .dropdown { background-image } (higher
+ * specificity) re-adds only the chevron SVG → tiled <> symbols.
+ * Match input chrome via longhands + official positioning tokens.
+ */
+select,
+.combobox-button,
+.dropdown {
+  border-radius: var(--input-radius);
+  border: 1px solid var(--background-modifier-border);
+  box-shadow: none;
+  background-color: var(--background-modifier-form-field);
+  background-repeat: no-repeat, repeat;
+  background-position: var(--dropdown-background-position);
+  background-size: var(--dropdown-background-size);
+}
+
+/* Search box: side panel / search view only — not combobox/suggestion popups */
+.workspace-leaf-content[data-type="search"] .search-input-container input,
+.workspace-leaf-content[data-type="search"] input,
+.nav-header .search-input-container input {
+  background-color: var(--background-secondary);
+  background-image: none;
+  border-color: var(--background-modifier-border);
+  box-shadow: none;
+}
+
+/*
+ * Suggest / combobox / command palette: search row = same surface as the list.
+ * Remap form-field tokens on the shell so Obsidian's input { background: var(--background-modifier-form-field) }
+ * resolves to transparent for every descendant (beats generic input[type=text/search] :not() specificity).
+ * !important mirrors metadata-container — needed for hover/focus longhands in app.css.
+ */
+.suggestion-container,
+.suggestion-container.combobox,
+.combobox.suggestion-container,
+.prompt {
+  --background-modifier-form-field: transparent;
+  --background-modifier-form-field-hover: transparent;
+  --interactive-normal: transparent;
+  --interactive-hover: transparent;
+}
+
+.suggestion-container .search-input-container,
+.combobox .search-input-container,
+.combobox.suggestion-container .search-input-container,
+.prompt-input-container {
+  background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  /* Gilt line frame — same language as dark desk / content card */
+  border: 1px solid var(--smartisan-gilt-frame-border) !important;
+  border-radius: var(--input-radius);
+  box-shadow:
+    0 0 0 1px var(--smartisan-gilt-frame-outer),
+    inset 0 1px 0 var(--smartisan-gilt-frame-highlight) !important;
+  /* Inset from suggestion shell — top/sides breathe; bottom stays close to list */
+  margin: 10px 12px 6px !important;
+  padding: 0;
+  box-sizing: border-box;
+  width: auto;
+  align-self: stretch;
+}
+
+.suggestion-container .search-input-container input,
+.suggestion-container .search-input-container input[type="search"],
+.suggestion-container .search-input-container input[type="text"],
+.combobox .search-input-container input,
+.combobox .search-input-container input[type="search"],
+.combobox .search-input-container input[type="text"],
+.combobox.suggestion-container .search-input-container input,
+.combobox.suggestion-container .search-input-container input[type="search"],
+.prompt-input-container input.prompt-input,
+input.prompt-input {
+  background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  border: none !important;
+  border-bottom: none !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+@media (hover: hover) {
+  .suggestion-container .search-input-container input:hover,
+  .combobox .search-input-container input:hover,
+  .prompt-input-container input.prompt-input:hover,
+  input.prompt-input:hover {
+    background: transparent !important;
+    background-color: transparent !important;
+    box-shadow: none !important;
+  }
+}
+
+.suggestion-container .search-input-container input:focus,
+.suggestion-container .search-input-container input:focus-visible,
+.combobox .search-input-container input:focus,
+.combobox .search-input-container input:focus-visible,
+.prompt-input-container input.prompt-input:focus,
+.prompt-input-container input.prompt-input:focus-visible,
+input.prompt-input:focus,
+input.prompt-input:focus-visible {
+  background: transparent !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+/* Properties YAML: never inherit modal form-field chip (default/hover/focus) */
+.metadata-container input,
+.metadata-container textarea,
+.metadata-container .dropdown,
+.metadata-container input.metadata-property-key-input,
+.metadata-container input.metadata-input-text,
+.metadata-container input.metadata-input-number,
+.metadata-container .metadata-input-longtext {
+  background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  border: none !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+@media (hover: hover) {
+  .metadata-container input:hover,
+  .metadata-container input.metadata-property-key-input:hover,
+  .metadata-container input.metadata-input-text:hover {
+    background: transparent !important;
+    background-color: transparent !important;
+    box-shadow: none !important;
+  }
+}
+
+.metadata-container input:focus,
+.metadata-container input:active,
+.metadata-container input.metadata-property-key-input:focus,
+.metadata-container input.metadata-property-key-input:active,
+.metadata-container input.metadata-input-text:focus,
+.metadata-container input.metadata-input-text:active {
+  background: transparent !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+.suggestion-item,
+.menu-item {
+  border-radius: 4px;
+  margin: 2px 4px;
+}
+
+.suggestion-item.is-selected,
+.menu-item:hover,
+.menu-item.selected {
+  background-color: var(--background-modifier-hover);
+}
+
+/* Settings */
+.vertical-tab-header {
+  background: var(--background-secondary);
+  border-right: 1px solid var(--background-modifier-border);
+}
+
+.vertical-tab-nav-item {
+  border-radius: var(--radius-s);
+  margin: 2px 6px;
+}
+
+.vertical-tab-nav-item.is-active {
+  background: var(--background-primary);
+  box-shadow: var(--shadow-s);
+}
+
+.setting-item {
+  border-color: var(--background-modifier-border);
+}
+
+.setting-item-heading {
+  border-bottom: 1px solid var(--background-modifier-border);
+}
+
+/* ========== Status bar ========== */
+.status-bar {
+  color: var(--text-muted);
+}
+
+/* ========== Graph — seamless editor desk (matches window frame) ==========
+ * Header must beat Obsidian .is-focused .workspace-leaf.mod-active .view-header
+ * (--file-header-background = paper primary). Content stays transparent so the
+ * leaf desk is a single continuous surface (no second wood/card layer).
+ */
+.workspace-leaf-content[data-type="graph"] .view-header,
+.workspace-leaf-content[data-type="localgraph"] .view-header,
+.is-focused
+  .workspace-leaf.mod-active
+  .workspace-leaf-content[data-type="graph"]
+  .view-header,
+.is-focused
+  .workspace-leaf.mod-active
+  .workspace-leaf-content[data-type="localgraph"]
+  .view-header {
+  --file-header-background: var(--smartisan-editor-desk-solid);
+  --file-header-background-focused: var(--smartisan-editor-desk-solid);
+  background-color: var(--smartisan-editor-desk-solid);
+  background-image: var(--smartisan-editor-desk-surface);
+  background-blend-mode: normal;
+  background-size: auto, auto, auto;
+  background-repeat: repeat;
+  background-attachment: fixed;
+  border: none;
+  border-bottom: none;
+  box-shadow: none;
+}
+
+.theme-light
+  .workspace-leaf-content[data-type="graph"]
+  .view-header,
+.theme-light
+  .workspace-leaf-content[data-type="localgraph"]
+  .view-header {
+  color: var(--smartisan-ink);
+  --text-normal: var(--smartisan-ink);
+  --text-muted: var(--smartisan-ink-muted);
+  --text-faint: var(--smartisan-ink-faint);
+  --icon-color: var(--smartisan-ink-muted);
+  --icon-color-hover: var(--smartisan-ink);
+  --icon-color-focused: var(--smartisan-ink);
+  --icon-color-active: var(--smartisan-ink);
+}
+
+.theme-dark
+  .workspace-leaf-content[data-type="graph"]
+  .view-header,
+.theme-dark
+  .workspace-leaf-content[data-type="localgraph"]
+  .view-header {
+  color: var(--smartisan-gilt);
+  --text-normal: var(--smartisan-gilt);
+  --text-muted: var(--smartisan-gilt-muted);
+  --text-faint: var(--smartisan-gilt-muted);
+  --icon-color: var(--smartisan-gilt);
+  --icon-color-hover: var(--smartisan-gilt-bright);
+  --icon-color-focused: var(--smartisan-gilt-bright);
+  --icon-color-active: var(--smartisan-gilt-bright);
+}
+
+.workspace-leaf-content[data-type="graph"] .view-content,
+.workspace-leaf-content[data-type="localgraph"] .view-content {
+  background: transparent;
+  background-color: transparent;
+  background-image: none;
+  border: none;
+  box-shadow: none;
+}
+
+.workspace-leaf-content[data-type="graph"] .view-header-title-container,
+.workspace-leaf-content[data-type="localgraph"] .view-header-title-container,
+.workspace-leaf-content[data-type="graph"] .view-header-nav-buttons,
+.workspace-leaf-content[data-type="localgraph"] .view-header-nav-buttons,
+.workspace-leaf-content[data-type="graph"] .view-header-title-parent,
+.workspace-leaf-content[data-type="localgraph"] .view-header-title-parent,
+.workspace-leaf-content[data-type="graph"] .view-header-title-wrapper,
+.workspace-leaf-content[data-type="localgraph"] .view-header-title-wrapper,
+.workspace-leaf-content[data-type="graph"] .view-header-breadcrumb,
+.workspace-leaf-content[data-type="localgraph"] .view-header-breadcrumb {
+  background: transparent;
+  background-image: none;
+  box-shadow: none;
+}
+
+/* Main editor graph: top header arc — clip the shared desk, no inset card */
+.mod-root .workspace-leaf-content[data-type="graph"] .view-header,
+.mod-root .workspace-leaf-content[data-type="localgraph"] .view-header {
+  border-radius: var(--smartisan-paper-radius) var(--smartisan-paper-radius) 0 0;
+  overflow: hidden;
+}
+
+/*
+ * Canvas: inherits mod-root paper card (header + inset + view-content).
+ * Cards use opaque fill + official rgb(var(--canvas-color)) color system.
+ */
+.mod-root .workspace-leaf-content[data-type="canvas"] {
+  --canvas-background: var(--smartisan-paper-fill);
+}
+
+.mod-root .workspace-leaf-content[data-type="canvas"] .canvas-wrapper {
+  --canvas-color: var(--smartisan-canvas-ink);
+  background-color: transparent;
+  background-image: none;
+}
+
+/*
+ * Card chrome — fountain-pen sticky note (must read clearly vs default UI).
+ * App sets contain:strict + overflow:hidden (clips outer ink) → force open.
+ * Look: asymmetric corners + thick ink + hard offset second stroke + inner wash.
+ */
+.mod-root .workspace-leaf-content[data-type="canvas"] .canvas-node-container {
+  --background-primary: var(--smartisan-canvas-card-fill);
+  --background-primary-alt: var(--smartisan-canvas-card-fill);
+  contain: layout style !important;
+  overflow: visible !important;
+  background-color: var(--smartisan-canvas-card-fill);
+  border-radius: var(--smartisan-canvas-card-radius) !important;
+  border: var(--smartisan-canvas-card-border) solid rgb(var(--canvas-color)) !important;
+  box-shadow:
+    3px 4px 0 0 rgba(var(--canvas-color), 0.42),
+    0 2px 6px rgba(61, 50, 41, 0.12) !important;
+}
+
+/* Inner ink wash — second pass around the note */
+.mod-root .workspace-leaf-content[data-type="canvas"] .canvas-node-container::after {
+  content: "";
+  position: absolute;
+  inset: 5px;
+  border: 1.5px solid rgba(var(--canvas-color), 0.35);
+  border-radius: var(--smartisan-canvas-card-radius-inner);
+  pointer-events: none;
+  z-index: 2;
+}
+
+.mod-root .workspace-leaf-content[data-type="canvas"] .canvas-node-content {
+  background-color: transparent;
+  border-radius: var(--smartisan-canvas-card-radius-inner);
+}
+
+.mod-root .workspace-leaf-content[data-type="canvas"] .canvas-node.is-themed .canvas-node-container,
+.mod-root .workspace-leaf-content[data-type="canvas"] .canvas-node[class*="mod-canvas-color-"] .canvas-node-container {
+  border-color: rgb(var(--canvas-color)) !important;
+  border-width: var(--smartisan-canvas-card-border-focus) !important;
+  background-color: color-mix(
+    in srgb,
+    rgb(var(--canvas-color)) 26%,
+    var(--smartisan-canvas-card-fill)
+  );
+  box-shadow:
+    3px 4px 0 0 rgba(var(--canvas-color), 0.5),
+    0 2px 6px rgba(61, 50, 41, 0.12) !important;
+}
+
+.mod-root .workspace-leaf-content[data-type="canvas"] .canvas-node.is-themed .canvas-node-container::after,
+.mod-root .workspace-leaf-content[data-type="canvas"] .canvas-node[class*="mod-canvas-color-"] .canvas-node-container::after {
+  border-color: rgba(var(--canvas-color), 0.45);
+}
+
+.mod-root .workspace-leaf-content[data-type="canvas"] .canvas-node.is-themed .canvas-node-content,
+.mod-root .workspace-leaf-content[data-type="canvas"] .canvas-node[class*="mod-canvas-color-"] .canvas-node-content {
+  background-color: rgba(var(--canvas-color), 0.22);
+}
+
+/* Selected / focused: heavier re-ink */
+.mod-root .workspace-leaf-content[data-type="canvas"] .canvas-node.is-selected .canvas-node-container,
+.mod-root .workspace-leaf-content[data-type="canvas"] .canvas-node.is-focused .canvas-node-container {
+  border-color: rgb(var(--canvas-color)) !important;
+  border-width: var(--smartisan-canvas-card-border-focus) !important;
+  box-shadow:
+    4px 5px 0 0 rgba(var(--canvas-color), 0.55),
+    0 0 0 calc(2px * var(--zoom-multiplier, 1)) rgba(var(--canvas-color), 0.25),
+    0 2px 8px rgba(61, 50, 41, 0.14) !important;
+}
+
+.mod-root .workspace-leaf-content[data-type="canvas"] .canvas-node.is-selected .canvas-node-container::after,
+.mod-root .workspace-leaf-content[data-type="canvas"] .canvas-node.is-focused .canvas-node-container::after {
+  border-color: rgba(var(--canvas-color), 0.55);
+  border-width: 1.75px;
+}
+
+.mod-root .workspace-leaf-content[data-type="canvas"] .canvas-node.is-editing .canvas-node-container {
+  border-color: var(--interactive-accent) !important;
+  box-shadow:
+    3px 4px 0 0 color-mix(in srgb, var(--interactive-accent) 48%, transparent),
+    0 0 0 calc(2px * var(--zoom-multiplier, 1)) color-mix(in srgb, var(--interactive-accent) 28%, transparent),
+    0 2px 8px rgba(61, 50, 41, 0.14) !important;
+}
+
+.mod-root .workspace-leaf-content[data-type="canvas"] .canvas-node.is-editing .canvas-node-container::after {
+  border-color: color-mix(in srgb, var(--interactive-accent) 45%, transparent);
+}
+
+/* Editing must not flatten a colored card back to plain cream */
+.mod-root
+  .workspace-leaf-content[data-type="canvas"]
+  .canvas-node.is-editing.is-themed
+  .canvas-node-container,
+.mod-root
+  .workspace-leaf-content[data-type="canvas"]
+  .canvas-node.is-editing[class*="mod-canvas-color-"]
+  .canvas-node-container {
+  background-color: color-mix(
+    in srgb,
+    rgb(var(--canvas-color)) 26%,
+    var(--smartisan-canvas-card-fill)
+  );
+}
+
+/* Group frames: open ink wash rectangle */
+.mod-root .workspace-leaf-content[data-type="canvas"] .canvas-node-group .canvas-node-container {
+  background-color: transparent !important;
+  border-style: solid !important;
+  border-width: 2.5px !important;
+  border-color: rgba(var(--canvas-color), 0.55) !important;
+  box-shadow: 3px 4px 0 0 rgba(var(--canvas-color), 0.28) !important;
+}
+
+.mod-root .workspace-leaf-content[data-type="canvas"] .canvas-node-group .canvas-node-container::after {
+  border-color: rgba(var(--canvas-color), 0.22);
+}
+
+.mod-root .workspace-leaf-content[data-type="canvas"] .canvas-node-group .canvas-node-content {
+  background-color: rgba(var(--canvas-color), 0.07);
+  border-radius: var(--smartisan-canvas-card-radius-inner);
+}
+
+.mod-root .workspace-leaf-content[data-type="canvas"] .canvas-menu {
+  --background-primary: var(--smartisan-canvas-card-fill);
+  background-color: var(--smartisan-canvas-card-fill);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-m);
+  box-shadow: var(--shadow-m);
+}
+
+.mod-root .workspace-leaf-content[data-type="canvas"] .canvas-submenu {
+  --background-primary: var(--smartisan-canvas-card-fill);
+  background-color: var(--smartisan-canvas-card-fill);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-s);
+  box-shadow: var(--shadow-m);
+}
+
+.mod-root .workspace-leaf-content[data-type="canvas"] .mod-canvas-color-1 {
+  --canvas-color: var(--canvas-color-1);
+}
+.mod-root .workspace-leaf-content[data-type="canvas"] .mod-canvas-color-2 {
+  --canvas-color: var(--canvas-color-2);
+}
+.mod-root .workspace-leaf-content[data-type="canvas"] .mod-canvas-color-3 {
+  --canvas-color: var(--canvas-color-3);
+}
+.mod-root .workspace-leaf-content[data-type="canvas"] .mod-canvas-color-4 {
+  --canvas-color: var(--canvas-color-4);
+}
+.mod-root .workspace-leaf-content[data-type="canvas"] .mod-canvas-color-5 {
+  --canvas-color: var(--canvas-color-5);
+}
+.mod-root .workspace-leaf-content[data-type="canvas"] .mod-canvas-color-6 {
+  --canvas-color: var(--canvas-color-6);
+}
+
+.mod-root .workspace-leaf-content[data-type="canvas"] .canvas-color-picker-item {
+  background-color: rgb(var(--canvas-color));
+  border: 2px solid var(--smartisan-canvas-card-fill);
+}
+
+.mod-root
+  .workspace-leaf-content[data-type="canvas"]
+  .canvas-color-picker-item.canvas-color-picker-custom:not(.is-active) {
+  background: conic-gradient(
+    var(--color-red),
+    var(--color-yellow),
+    var(--color-green),
+    var(--color-blue),
+    var(--color-purple),
+    var(--color-red)
+  );
+}
+
+/*
+ * Canvas edges — fountain-pen ink on paper.
+ * Round caps, slightly heavier stroke, diluted color (not neon UI lines).
+ */
+.mod-root .workspace-leaf-content[data-type="canvas"] .canvas-edges path.canvas-display-path {
+  stroke: rgba(var(--canvas-color), 0.88);
+  stroke-width: calc(var(--smartisan-canvas-ink-width) * var(--zoom-multiplier, 1));
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  fill: none;
+  opacity: 0.92;
+  transition: stroke-width 120ms ease-out, opacity 120ms ease-out, stroke 120ms ease-out;
+}
+
+.mod-root .workspace-leaf-content[data-type="canvas"] .canvas-edges polygon.canvas-path-end {
+  stroke: rgba(var(--canvas-color), 0.92);
+  fill: rgba(var(--canvas-color), 0.92);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1px;
+}
+
+/* Hover / focus: ink bloom — a touch heavier, slightly wetter */
+.mod-root
+  .workspace-leaf-content[data-type="canvas"]
+  .canvas-edges
+  g.is-focused
+  path.canvas-display-path,
+.mod-root
+  .workspace-leaf-content[data-type="canvas"]
+  .canvas:not(.is-connecting)
+  .canvas-edges
+  g:hover
+  path.canvas-display-path {
+  stroke: rgb(var(--canvas-color));
+  stroke-width: calc(var(--smartisan-canvas-ink-width-focus) * var(--zoom-multiplier, 1));
+  opacity: 1;
+}
+
+.mod-root
+  .workspace-leaf-content[data-type="canvas"]
+  .canvas-edges
+  g.is-focused
+  path.canvas-interaction-path,
+.mod-root
+  .workspace-leaf-content[data-type="canvas"]
+  .canvas:not(.is-connecting)
+  .canvas-edges
+  g:hover
+  path.canvas-interaction-path {
+  stroke: rgba(var(--canvas-color), 0.12);
+}
+
+.mod-root
+  .workspace-leaf-content[data-type="canvas"]
+  .canvas-edges
+  g.is-focused
+  polygon.canvas-path-end,
+.mod-root
+  .workspace-leaf-content[data-type="canvas"]
+  .canvas:not(.is-connecting)
+  .canvas-edges
+  g:hover
+  polygon.canvas-path-end {
+  stroke: rgb(var(--canvas-color));
+  fill: rgb(var(--canvas-color));
+}
+
+/* Edge labels: small ink annotation slips */
+.mod-root .workspace-leaf-content[data-type="canvas"] .canvas-path-label {
+  color: var(--smartisan-ink);
+  background-color: var(--smartisan-canvas-card-fill);
+  border: 1px solid rgba(var(--smartisan-canvas-ink), 0.28);
+  border-radius: var(--radius-s);
+  box-shadow: var(--shadow-s);
+  font-family: var(--font-text-theme);
+  font-size: calc(0.85em * var(--zoom-multiplier, 1));
+}
+
+.theme-dark .mod-root .workspace-leaf-content[data-type="canvas"] .canvas-path-label {
+  color: #e8dfd0;
+}
+
+.mod-root .workspace-leaf-content[data-type="canvas"] .canvas-control-group {
+  background-color: var(--smartisan-paper-fill);
+  background-image: var(--smartisan-paper-surface);
+  background-size: var(--smartisan-paper-bg-size);
+  background-blend-mode: var(--smartisan-paper-bg-blend);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-m);
+  box-shadow: var(--shadow-m);
+}
+
+.mod-root .workspace-leaf-content[data-type="canvas"] .canvas-control-item {
+  color: var(--text-muted);
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+
+.mod-root .workspace-leaf-content[data-type="canvas"] .canvas-control-item:hover {
+  color: var(--text-normal);
+  background-color: var(--background-modifier-hover);
+}
+
+.mod-root .workspace-leaf-content[data-type="canvas"] .canvas-controls {
+  right: calc(var(--smartisan-dock-inset) + 2px);
+  bottom: calc(var(--smartisan-dock-inset) + 2px);
+}
+
+.mod-root .workspace-leaf-content[data-type="canvas"] .canvas-card-menu {
+  background-color: var(--smartisan-paper-fill);
+  background-image: var(--smartisan-paper-surface);
+  background-size: var(--smartisan-paper-bg-size);
+  background-blend-mode: var(--smartisan-paper-bg-blend);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-m);
+  box-shadow: var(--shadow-m);
+  bottom: calc(var(--smartisan-dock-inset) + 2px);
+}
+
+.mod-root .workspace-leaf-content[data-type="canvas"] .canvas-card-menu-button {
+  color: var(--text-muted);
+  background: transparent;
+}
+
+.mod-root .workspace-leaf-content[data-type="canvas"] .canvas-card-menu-button:hover {
+  color: var(--text-normal);
+  background-color: var(--background-modifier-hover);
+}
+
+/* ========== Search results ========== */
+.search-result-file-title {
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-s);
+  margin-bottom: 0;
+  box-shadow: none;
+}
+
+.search-result-file-title:hover {
+  background: var(--search-result-background-hover);
+}
+
+.search-result-file-title.is-selected,
+.search-result-file-title.is-active {
+  background: var(--search-result-background-active);
+}
+
+.search-result-file-matched-text,
+.markdown-rendered mark,
+.cm-highlight {
+  background-color: var(--text-highlight-bg);
+  color: inherit;
+  border-radius: 2px;
+}
+
+/* ========== Tags / callouts / quotes / embeds ========== */
+a.tag,
+.tag {
+  border-radius: var(--tag-radius);
+  border: var(--tag-border-width) solid var(--tag-border-color);
+  padding: var(--tag-padding-y) var(--tag-padding-x);
+  font-weight: 500;
+}
+
+.markdown-preview-view blockquote,
+.markdown-rendered blockquote {
+  border-left-width: var(--blockquote-border-thickness);
+  border-left-color: var(--blockquote-border-color);
+  background-color: var(--background-primary-alt);
+  border-radius: 0 var(--radius-s) var(--radius-s) 0;
+  padding: 0.55em 1em;
+}
+
+.callout {
+  border-radius: var(--callout-radius);
+  border: var(--callout-border-width) solid var(--background-modifier-border);
+}
+
+.markdown-embed,
+.internal-embed {
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-m);
+  background: var(--background-primary-alt);
+  box-shadow: var(--shadow-s);
+}
+
+/* ========== Buttons ========== */
+button {
+  border-radius: var(--input-radius);
+}
+
+.mod-cta {
+  background-color: var(--interactive-accent);
+  color: var(--text-on-accent);
+}
+
+.mod-cta:hover {
+  background-color: var(--interactive-accent-hover);
+}
+
+/* ========== Scrollbars ========== */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: rgba(92, 64, 51, 0.28);
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+.theme-dark ::-webkit-scrollbar-thumb {
+  background-color: rgba(232, 223, 208, 0.22);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(92, 64, 51, 0.42);
+}
+
+::-webkit-scrollbar-track {
+  background-color: transparent;
+}
+
+/* ========== Mobile adjustments ========== */
+body.is-mobile
+  .mod-root
+  .workspace-leaf-content:not([data-type="graph"]):not([data-type="localgraph"]) {
+  --smartisan-paper-top-inset: var(--smartisan-dock-inset);
+  --smartisan-paper-inline-inset: var(--smartisan-dock-inset);
+  --smartisan-paper-bottom-inset: var(--smartisan-dock-inset);
+  padding-top: var(--smartisan-paper-top-inset);
+  padding-inline: var(--smartisan-paper-inline-inset);
+  padding-bottom: var(--smartisan-paper-bottom-inset);
+}
+
+body.is-mobile
+  .mod-root
+  .workspace-leaf-content:not([data-type="graph"]):not([data-type="localgraph"])
+  .view-content {
+  margin: 0;
+  padding: 0;
+}
+
+
+/* ========== Desk surface variants (Style Settings → 桌面材质) ==========
+ * No class: .theme-light = walnut, .theme-dark = lacquer (install defaults).
+ */
+body.smartisan-desk-oak.theme-light {
+  --smartisan-wood-grain-angle: 32deg;
+  --smartisan-desk-bg: linear-gradient(165deg, #d8c19a 0%, #c4a574 42%, #b08958 100%);
+  --smartisan-editor-desk: linear-gradient(165deg, #c4a574 0%, #a67c52 48%, #8f6a45 100%);
+  --smartisan-editor-desk-solid: #a67c52;
+  --smartisan-editor-desk-surface:
+    var(--smartisan-wood-texture),
+    repeating-linear-gradient(
+      var(--smartisan-wood-grain-angle),
+      rgba(92, 64, 51, 0.1) 0px,
+      rgba(92, 64, 51, 0.1) 1px,
+      transparent 1px,
+      transparent 8px
+    ),
+    var(--smartisan-editor-desk);
+}
+
+body.smartisan-desk-oak.theme-dark {
+  --smartisan-wood-texture: var(--smartisan-tex-wood-dark);
+  --smartisan-wood-grain-angle: 32deg;
+  --smartisan-desk-bg: linear-gradient(165deg, #2a211c 0%, #221b17 45%, #181310 100%);
+  --smartisan-editor-desk: linear-gradient(165deg, #1a1410 0%, #120e0b 55%, #0c0907 100%);
+  --smartisan-editor-desk-solid: #120e0b;
+  --smartisan-wood-bg: var(--smartisan-wood-texture), var(--smartisan-desk-bg);
+  --smartisan-editor-desk-surface: var(--smartisan-wood-texture), var(--smartisan-editor-desk);
+}
+
+/* Walnut — deeper reddish brown */
+body.smartisan-desk-walnut.theme-light {
+  --smartisan-wood-grain-angle: 28deg;
+  --smartisan-desk-bg: linear-gradient(165deg, #c8a882 0%, #9a6848 42%, #7a5038 100%);
+  --smartisan-editor-desk: linear-gradient(165deg, #b88860 0%, #8f5c40 48%, #704830 100%);
+  --smartisan-editor-desk-solid: #8f5c40;
+  --smartisan-editor-desk-surface:
+    var(--smartisan-wood-texture),
+    repeating-linear-gradient(
+      var(--smartisan-wood-grain-angle),
+      rgba(72, 40, 28, 0.12) 0px,
+      rgba(72, 40, 28, 0.12) 1px,
+      transparent 1px,
+      transparent 8px
+    ),
+    var(--smartisan-editor-desk);
+}
+
+body.smartisan-desk-walnut.theme-dark {
+  --smartisan-wood-texture: var(--smartisan-tex-wood-dark);
+  --smartisan-wood-grain-angle: 28deg;
+  --smartisan-desk-bg: linear-gradient(165deg, #3a2420 0%, #281814 42%, #1a0e0a 100%);
+  --smartisan-editor-desk: linear-gradient(165deg, #2e1c18 0%, #1e100c 52%, #140804 100%);
+  --smartisan-editor-desk-solid: #1e100c;
+  --smartisan-wood-bg: var(--smartisan-wood-texture), var(--smartisan-desk-bg);
+  --smartisan-editor-desk-surface: var(--smartisan-wood-texture), var(--smartisan-editor-desk);
+}
+
+/* Maple — lighter golden wood */
+body.smartisan-desk-maple.theme-light {
+  --smartisan-wood-grain-angle: 24deg;
+  --smartisan-desk-bg: linear-gradient(165deg, #ecd8a8 0%, #dcc088 42%, #c8a868 100%);
+  --smartisan-editor-desk: linear-gradient(165deg, #e0c890 0%, #d0b070 48%, #b89858 100%);
+  --smartisan-editor-desk-solid: #d0b070;
+  --smartisan-editor-desk-surface:
+    var(--smartisan-wood-texture),
+    repeating-linear-gradient(
+      var(--smartisan-wood-grain-angle),
+      rgba(120, 88, 40, 0.08) 0px,
+      rgba(120, 88, 40, 0.08) 1px,
+      transparent 1px,
+      transparent 7px
+    ),
+    var(--smartisan-editor-desk);
+}
+
+body.smartisan-desk-maple.theme-dark {
+  --smartisan-wood-texture: var(--smartisan-tex-wood-dark);
+  --smartisan-wood-grain-angle: 24deg;
+  --smartisan-desk-bg: linear-gradient(165deg, #3a3220 0%, #2e2818 45%, #221c10 100%);
+  --smartisan-editor-desk: linear-gradient(165deg, #322a18 0%, #262014 55%, #1a1610 100%);
+  --smartisan-editor-desk-solid: #262014;
+  --smartisan-wood-bg: var(--smartisan-wood-texture), var(--smartisan-desk-bg);
+  --smartisan-editor-desk-surface: var(--smartisan-wood-texture), var(--smartisan-editor-desk);
+}
+
+/* Vertical oak — same palette, grain runs vertically */
+body.smartisan-desk-oak-vertical.theme-light {
+  --smartisan-wood-grain-angle: 90deg;
+  --smartisan-wood-texture: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='280' height='280'%3E%3Cdefs%3E%3Cfilter id='w'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.035 0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.32 0 0 0 0 0.2 0 0 0 0 0.1 0 0 0 0.45 0'/%3E%3C/filter%3E%3C/defs%3E%3Cg transform='rotate(90 140 140)'%3E%3Crect x='-90' y='-90' width='460' height='460' filter='url(%23w)' opacity='0.72'/%3E%3C/g%3E%3C/svg%3E");
+}
+
+body.smartisan-desk-oak-vertical.theme-dark {
+  --smartisan-wood-grain-angle: 90deg;
+  --smartisan-wood-texture: var(--smartisan-tex-wood-vertical-dark);
+  --smartisan-wood-bg:
+    var(--smartisan-wood-texture),
+    repeating-linear-gradient(
+      90deg,
+      rgba(212, 184, 120, 0.13) 0px,
+      rgba(212, 184, 120, 0.13) 1px,
+      transparent 1px,
+      transparent 9px
+    ),
+    var(--smartisan-desk-bg);
+  --smartisan-editor-desk-surface:
+    var(--smartisan-wood-texture),
+    repeating-linear-gradient(
+      90deg,
+      rgba(212, 184, 120, 0.13) 0px,
+      rgba(212, 184, 120, 0.13) 1px,
+      transparent 1px,
+      transparent 9px
+    ),
+    var(--smartisan-editor-desk);
+}
+
+/* Lacquer — satin dark wood, minimal grain */
+body.smartisan-desk-lacquer.theme-light {
+  --smartisan-wood-texture: var(--smartisan-tex-lacquer);
+  --smartisan-desk-bg: linear-gradient(168deg, #5a4432 0%, #3e2e22 48%, #2a2018 100%);
+  --smartisan-editor-desk: linear-gradient(168deg, #4a3828 0%, #342618 52%, #241a12 100%);
+  --smartisan-editor-desk-solid: #342618;
+  --smartisan-wood-bg:
+    var(--smartisan-wood-texture),
+    linear-gradient(180deg, rgba(255, 248, 236, 0.08) 0%, transparent 38%, rgba(0, 0, 0, 0.12) 100%),
+    var(--smartisan-desk-bg);
+  --smartisan-editor-desk-surface:
+    var(--smartisan-wood-texture),
+    linear-gradient(180deg, rgba(255, 248, 236, 0.1) 0%, transparent 42%, rgba(0, 0, 0, 0.14) 100%),
+    var(--smartisan-editor-desk);
+}
+
+body.smartisan-desk-lacquer.theme-dark {
+  --smartisan-wood-texture: var(--smartisan-tex-lacquer-dark);
+  --smartisan-desk-bg: linear-gradient(168deg, #1a1a24 0%, #0e0e16 50%, #06060a 100%);
+  --smartisan-editor-desk: linear-gradient(168deg, #12121a 0%, #0a0a10 55%, #040406 100%);
+  --smartisan-editor-desk-solid: #0a0a10;
+  --smartisan-wood-bg:
+    var(--smartisan-wood-texture),
+    linear-gradient(180deg, rgba(232, 220, 200, 0.14) 0%, transparent 32%, rgba(0, 0, 0, 0.28) 100%),
+    var(--smartisan-desk-bg);
+  --smartisan-editor-desk-surface:
+    var(--smartisan-wood-texture),
+    linear-gradient(180deg, rgba(240, 230, 210, 0.16) 0%, transparent 38%, rgba(0, 0, 0, 0.32) 100%),
+    var(--smartisan-editor-desk);
+}
+
+/* Leather writing pad */
+body.smartisan-desk-leather.theme-light {
+  --smartisan-wood-texture: var(--smartisan-tex-leather);
+  --smartisan-desk-bg: linear-gradient(165deg, #b89068 0%, #9a7050 45%, #7a5840 100%);
+  --smartisan-editor-desk: linear-gradient(165deg, #a88058 0%, #8a6848 50%, #6e5038 100%);
+  --smartisan-editor-desk-solid: #8a6848;
+  --smartisan-wood-bg: var(--smartisan-wood-texture), var(--smartisan-desk-bg);
+  --smartisan-editor-desk-surface: var(--smartisan-wood-texture), var(--smartisan-editor-desk);
+}
+
+body.smartisan-desk-leather.theme-dark {
+  --smartisan-wood-texture: var(--smartisan-tex-leather-dark);
+  --smartisan-desk-bg: linear-gradient(165deg, #342418 0%, #24180e 45%, #181008 100%);
+  --smartisan-editor-desk: linear-gradient(165deg, #2a1c14 0%, #1c120a 55%, #120a06 100%);
+  --smartisan-editor-desk-solid: #1c120a;
+  --smartisan-wood-bg: var(--smartisan-wood-texture), var(--smartisan-desk-bg);
+  --smartisan-editor-desk-surface: var(--smartisan-wood-texture), var(--smartisan-editor-desk);
+}
+
+/* Bamboo mat — fine parallel slats */
+body.smartisan-desk-bamboo.theme-light {
+  --smartisan-wood-texture: none;
+  --smartisan-desk-bg: linear-gradient(165deg, #ddd0a8 0%, #cfc090 42%, #b8a878 100%);
+  --smartisan-editor-desk: linear-gradient(165deg, #d0c088 0%, #c0b080 48%, #a89868 100%);
+  --smartisan-editor-desk-solid: #c0b080;
+  --smartisan-wood-bg:
+    repeating-linear-gradient(
+      0deg,
+      rgba(92, 64, 51, 0.14) 0px,
+      rgba(92, 64, 51, 0.14) 1px,
+      transparent 1px,
+      transparent 4px
+    ),
+    var(--smartisan-desk-bg);
+  --smartisan-editor-desk-surface:
+    repeating-linear-gradient(
+      0deg,
+      rgba(92, 64, 51, 0.16) 0px,
+      rgba(92, 64, 51, 0.16) 1px,
+      transparent 1px,
+      transparent 4px
+    ),
+    var(--smartisan-editor-desk);
+}
+
+body.smartisan-desk-bamboo.theme-dark {
+  --smartisan-wood-texture: none;
+  --smartisan-desk-bg: linear-gradient(165deg, #2e2818 0%, #242018 45%, #1a1610 100%);
+  --smartisan-editor-desk: linear-gradient(165deg, #262014 0%, #1c1810 55%, #14100c 100%);
+  --smartisan-editor-desk-solid: #1c1810;
+  --smartisan-wood-bg:
+    repeating-linear-gradient(
+      0deg,
+      rgba(212, 184, 120, 0.22) 0px,
+      rgba(212, 184, 120, 0.22) 1px,
+      transparent 1px,
+      transparent 5px
+    ),
+    var(--smartisan-desk-bg);
+  --smartisan-editor-desk-surface:
+    repeating-linear-gradient(
+      0deg,
+      rgba(232, 208, 160, 0.24) 0px,
+      rgba(232, 208, 160, 0.24) 1px,
+      transparent 1px,
+      transparent 5px
+    ),
+    var(--smartisan-editor-desk);
+}
+
+/* Felt — quiet matte pad */
+body.smartisan-desk-felt.theme-light {
+  --smartisan-wood-texture: var(--smartisan-tex-felt);
+  --smartisan-desk-bg: linear-gradient(180deg, #c8b8a0 0%, #b8a890 100%);
+  --smartisan-editor-desk: linear-gradient(180deg, #b0a088 0%, #a09078 100%);
+  --smartisan-editor-desk-solid: #a09078;
+  --smartisan-wood-bg: var(--smartisan-wood-texture), var(--smartisan-desk-bg);
+  --smartisan-editor-desk-surface: var(--smartisan-wood-texture), var(--smartisan-editor-desk);
+}
+
+body.smartisan-desk-felt.theme-dark {
+  --smartisan-wood-texture: var(--smartisan-tex-felt-dark);
+  --smartisan-desk-bg: linear-gradient(180deg, #222018 0%, #161410 100%);
+  --smartisan-editor-desk: linear-gradient(180deg, #1a1612 0%, #100e0a 100%);
+  --smartisan-editor-desk-solid: #100e0a;
+  --smartisan-wood-bg: var(--smartisan-wood-texture), var(--smartisan-desk-bg);
+  --smartisan-editor-desk-surface: var(--smartisan-wood-texture), var(--smartisan-editor-desk);
+}
+
+/* Cork board */
+body.smartisan-desk-cork.theme-light {
+  --smartisan-wood-texture: var(--smartisan-tex-cork);
+  --smartisan-desk-bg: linear-gradient(165deg, #d4b080 0%, #c4a068 45%, #b09058 100%);
+  --smartisan-editor-desk: linear-gradient(165deg, #c8a470 0%, #b89460 50%, #a88450 100%);
+  --smartisan-editor-desk-solid: #b89460;
+  --smartisan-wood-bg: var(--smartisan-wood-texture), var(--smartisan-desk-bg);
+  --smartisan-editor-desk-surface: var(--smartisan-wood-texture), var(--smartisan-editor-desk);
+}
+
+body.smartisan-desk-cork.theme-dark {
+  --smartisan-wood-texture: var(--smartisan-tex-cork-dark);
+  --smartisan-desk-bg: linear-gradient(165deg, #3e2e1c 0%, #322418 45%, #261c12 100%);
+  --smartisan-editor-desk: linear-gradient(165deg, #362818 0%, #2a2014 55%, #1e160e 100%);
+  --smartisan-editor-desk-solid: #2a2014;
+  --smartisan-wood-bg: var(--smartisan-wood-texture), var(--smartisan-desk-bg);
+  --smartisan-editor-desk-surface: var(--smartisan-wood-texture), var(--smartisan-editor-desk);
+}
+
+
+/* ========== Print ========== */
+@media print {
+  body,
+  .app-container,
+  .mod-root .workspace-leaf-content {
+    background: white !important;
+  }
+}
