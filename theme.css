@@ -100,8 +100,8 @@ body {
   --smartisan-paper-fill: var(--smartisan-paper-cream);
   /* Canvas cards: opaque sheet on paper workspace (not transparent glass) */
   --smartisan-canvas-card-fill: #faf6ee;
-  /* Iron-gall fountain-pen ink (RGB triplet for rgb(var(--canvas-color))) */
-  --smartisan-canvas-ink: 61, 50, 41;
+  /* Iron-gall fountain-pen ink — full CSS color (Obsidian 1.13+) */
+  --smartisan-canvas-ink: rgb(61, 50, 41);
   --smartisan-canvas-default-border: var(--smartisan-canvas-ink);
   --smartisan-canvas-ink-width: 2.75px;
   --smartisan-canvas-ink-width-focus: 4.5px;
@@ -411,13 +411,13 @@ body {
   --canvas-background: var(--smartisan-paper-fill);
   --canvas-dot-pattern: rgba(92, 64, 51, 0.16);
   --canvas-card-label-color: var(--smartisan-ink);
-  /* Obsidian uses rgb(var(--canvas-color)) — must be R,G,B triplets, not hex */
-  --canvas-color-1: var(--color-red-rgb);
-  --canvas-color-2: var(--color-orange-rgb);
-  --canvas-color-3: var(--color-yellow-rgb);
-  --canvas-color-4: var(--color-green-rgb);
-  --canvas-color-5: var(--color-cyan-rgb);
-  --canvas-color-6: var(--color-purple-rgb);
+  /* Obsidian 1.13+: --canvas-color-N must be full CSS colors */
+  --canvas-color-1: var(--color-red);
+  --canvas-color-2: var(--color-orange);
+  --canvas-color-3: var(--color-yellow);
+  --canvas-color-4: var(--color-green);
+  --canvas-color-5: var(--color-cyan);
+  --canvas-color-6: var(--color-purple);
 
   --code-background: #d9cbb4;
   --code-normal: #5c4033;
@@ -590,7 +590,7 @@ body {
 
   --smartisan-paper-fill: #3f3730;
   --smartisan-canvas-card-fill: #f8f4ec;
-  --smartisan-canvas-ink: 210, 196, 172;
+  --smartisan-canvas-ink: rgb(210, 196, 172);
   --smartisan-canvas-default-border: var(--smartisan-canvas-ink);
   --background-primary: #3f3730;
   --background-primary-alt: #4a4139;
@@ -700,12 +700,12 @@ body {
   --canvas-background: var(--smartisan-paper-fill);
   --canvas-dot-pattern: rgba(232, 223, 208, 0.12);
   --canvas-card-label-color: #e8dfd0;
-  --canvas-color-1: var(--color-red-rgb);
-  --canvas-color-2: var(--color-orange-rgb);
-  --canvas-color-3: var(--color-yellow-rgb);
-  --canvas-color-4: var(--color-green-rgb);
-  --canvas-color-5: var(--color-cyan-rgb);
-  --canvas-color-6: var(--color-purple-rgb);
+  --canvas-color-1: var(--color-red);
+  --canvas-color-2: var(--color-orange);
+  --canvas-color-3: var(--color-yellow);
+  --canvas-color-4: var(--color-green);
+  --canvas-color-5: var(--color-cyan);
+  --canvas-color-6: var(--color-purple);
 
   --code-background: #312822;
   --code-normal: #e8dfd0;
@@ -2608,7 +2608,7 @@ input.prompt-input:focus-visible {
 
 /*
  * Canvas: inherits mod-root paper card (header + inset + view-content).
- * Cards use opaque fill + official rgb(var(--canvas-color)) color system.
+ * Cards use opaque fill + official var(--canvas-color) color system.
  */
 .mod-root .workspace-leaf-content[data-type="canvas"] {
   --canvas-background: var(--smartisan-paper-fill);
@@ -2632,9 +2632,9 @@ input.prompt-input:focus-visible {
   overflow: visible !important;
   background-color: var(--smartisan-canvas-card-fill);
   border-radius: var(--smartisan-canvas-card-radius) !important;
-  border: var(--smartisan-canvas-card-border) solid rgb(var(--canvas-color)) !important;
+  border: var(--smartisan-canvas-card-border) solid var(--canvas-color) !important;
   box-shadow:
-    3px 4px 0 0 rgba(var(--canvas-color), 0.42),
+    3px 4px 0 0 color-mix(in srgb, var(--canvas-color) 42%, transparent),
     0 2px 6px rgba(61, 50, 41, 0.12) !important;
 }
 
@@ -2643,7 +2643,7 @@ input.prompt-input:focus-visible {
   content: "";
   position: absolute;
   inset: 5px;
-  border: 1.5px solid rgba(var(--canvas-color), 0.35);
+  border: 1.5px solid color-mix(in srgb, var(--canvas-color) 35%, transparent);
   border-radius: var(--smartisan-canvas-card-radius-inner);
   pointer-events: none;
   z-index: 2;
@@ -2656,42 +2656,42 @@ input.prompt-input:focus-visible {
 
 .mod-root .workspace-leaf-content[data-type="canvas"] .canvas-node.is-themed .canvas-node-container,
 .mod-root .workspace-leaf-content[data-type="canvas"] .canvas-node[class*="mod-canvas-color-"] .canvas-node-container {
-  border-color: rgb(var(--canvas-color)) !important;
+  border-color: var(--canvas-color) !important;
   border-width: var(--smartisan-canvas-card-border-focus) !important;
   background-color: color-mix(
     in srgb,
-    rgb(var(--canvas-color)) 26%,
+    var(--canvas-color) 26%,
     var(--smartisan-canvas-card-fill)
   );
   box-shadow:
-    3px 4px 0 0 rgba(var(--canvas-color), 0.5),
+    3px 4px 0 0 color-mix(in srgb, var(--canvas-color) 50%, transparent),
     0 2px 6px rgba(61, 50, 41, 0.12) !important;
 }
 
 .mod-root .workspace-leaf-content[data-type="canvas"] .canvas-node.is-themed .canvas-node-container::after,
 .mod-root .workspace-leaf-content[data-type="canvas"] .canvas-node[class*="mod-canvas-color-"] .canvas-node-container::after {
-  border-color: rgba(var(--canvas-color), 0.45);
+  border-color: color-mix(in srgb, var(--canvas-color) 45%, transparent);
 }
 
 .mod-root .workspace-leaf-content[data-type="canvas"] .canvas-node.is-themed .canvas-node-content,
 .mod-root .workspace-leaf-content[data-type="canvas"] .canvas-node[class*="mod-canvas-color-"] .canvas-node-content {
-  background-color: rgba(var(--canvas-color), 0.22);
+  background-color: color-mix(in srgb, var(--canvas-color) 22%, transparent);
 }
 
 /* Selected / focused: heavier re-ink */
 .mod-root .workspace-leaf-content[data-type="canvas"] .canvas-node.is-selected .canvas-node-container,
 .mod-root .workspace-leaf-content[data-type="canvas"] .canvas-node.is-focused .canvas-node-container {
-  border-color: rgb(var(--canvas-color)) !important;
+  border-color: var(--canvas-color) !important;
   border-width: var(--smartisan-canvas-card-border-focus) !important;
   box-shadow:
-    4px 5px 0 0 rgba(var(--canvas-color), 0.55),
-    0 0 0 calc(2px * var(--zoom-multiplier, 1)) rgba(var(--canvas-color), 0.25),
+    4px 5px 0 0 color-mix(in srgb, var(--canvas-color) 55%, transparent),
+    0 0 0 calc(2px * var(--zoom-multiplier, 1)) color-mix(in srgb, var(--canvas-color) 25%, transparent),
     0 2px 8px rgba(61, 50, 41, 0.14) !important;
 }
 
 .mod-root .workspace-leaf-content[data-type="canvas"] .canvas-node.is-selected .canvas-node-container::after,
 .mod-root .workspace-leaf-content[data-type="canvas"] .canvas-node.is-focused .canvas-node-container::after {
-  border-color: rgba(var(--canvas-color), 0.55);
+  border-color: color-mix(in srgb, var(--canvas-color) 55%, transparent);
   border-width: 1.75px;
 }
 
@@ -2718,7 +2718,7 @@ input.prompt-input:focus-visible {
   .canvas-node-container {
   background-color: color-mix(
     in srgb,
-    rgb(var(--canvas-color)) 26%,
+    var(--canvas-color) 26%,
     var(--smartisan-canvas-card-fill)
   );
 }
@@ -2728,16 +2728,16 @@ input.prompt-input:focus-visible {
   background-color: transparent !important;
   border-style: solid !important;
   border-width: 2.5px !important;
-  border-color: rgba(var(--canvas-color), 0.55) !important;
-  box-shadow: 3px 4px 0 0 rgba(var(--canvas-color), 0.28) !important;
+  border-color: color-mix(in srgb, var(--canvas-color) 55%, transparent) !important;
+  box-shadow: 3px 4px 0 0 color-mix(in srgb, var(--canvas-color) 28%, transparent) !important;
 }
 
 .mod-root .workspace-leaf-content[data-type="canvas"] .canvas-node-group .canvas-node-container::after {
-  border-color: rgba(var(--canvas-color), 0.22);
+  border-color: color-mix(in srgb, var(--canvas-color) 22%, transparent);
 }
 
 .mod-root .workspace-leaf-content[data-type="canvas"] .canvas-node-group .canvas-node-content {
-  background-color: rgba(var(--canvas-color), 0.07);
+  background-color: color-mix(in srgb, var(--canvas-color) 7%, transparent);
   border-radius: var(--smartisan-canvas-card-radius-inner);
 }
 
@@ -2777,7 +2777,7 @@ input.prompt-input:focus-visible {
 }
 
 .mod-root .workspace-leaf-content[data-type="canvas"] .canvas-color-picker-item {
-  background-color: rgb(var(--canvas-color));
+  background-color: var(--canvas-color);
   border: 2px solid var(--smartisan-canvas-card-fill);
 }
 
@@ -2795,28 +2795,33 @@ input.prompt-input:focus-visible {
 }
 
 /*
- * Canvas edges — fountain-pen ink on paper.
- * Round caps, slightly heavier stroke, diluted color (not neon UI lines).
+ * Canvas edges — Obsidian 1.13+: --canvas-color is a full CSS color.
+ * Core uses stroke: var(--canvas-color). Never wrap in rgb()/rgba().
  */
 .mod-root .workspace-leaf-content[data-type="canvas"] .canvas-edges path.canvas-display-path {
-  stroke: rgba(var(--canvas-color), 0.88);
+  stroke: var(--canvas-color);
+  stroke-opacity: 1;
   stroke-width: calc(var(--smartisan-canvas-ink-width) * var(--zoom-multiplier, 1));
   stroke-linecap: round;
   stroke-linejoin: round;
   fill: none;
-  opacity: 0.92;
-  transition: stroke-width 120ms ease-out, opacity 120ms ease-out, stroke 120ms ease-out;
+  opacity: 1;
+  transition: stroke-width 120ms ease-out;
 }
 
-.mod-root .workspace-leaf-content[data-type="canvas"] .canvas-edges polygon.canvas-path-end {
-  stroke: rgba(var(--canvas-color), 0.92);
-  fill: rgba(var(--canvas-color), 0.92);
+.mod-root .workspace-leaf-content[data-type="canvas"] .canvas-edges polygon.canvas-path-end,
+.mod-root .workspace-leaf-content[data-type="canvas"] .canvas-edges polyline.canvas-path-end {
+  stroke: var(--canvas-color);
+  fill: var(--canvas-color);
+  stroke-opacity: 1;
+  fill-opacity: 1;
   stroke-linecap: round;
   stroke-linejoin: round;
   stroke-width: 1px;
+  opacity: 1;
 }
 
-/* Hover / focus: ink bloom — a touch heavier, slightly wetter */
+/* Hover / focus: ink bloom — heavier stroke only */
 .mod-root
   .workspace-leaf-content[data-type="canvas"]
   .canvas-edges
@@ -2828,9 +2833,7 @@ input.prompt-input:focus-visible {
   .canvas-edges
   g:hover
   path.canvas-display-path {
-  stroke: rgb(var(--canvas-color));
   stroke-width: calc(var(--smartisan-canvas-ink-width-focus) * var(--zoom-multiplier, 1));
-  opacity: 1;
 }
 
 .mod-root
@@ -2844,29 +2847,14 @@ input.prompt-input:focus-visible {
   .canvas-edges
   g:hover
   path.canvas-interaction-path {
-  stroke: rgba(var(--canvas-color), 0.12);
-}
-
-.mod-root
-  .workspace-leaf-content[data-type="canvas"]
-  .canvas-edges
-  g.is-focused
-  polygon.canvas-path-end,
-.mod-root
-  .workspace-leaf-content[data-type="canvas"]
-  .canvas:not(.is-connecting)
-  .canvas-edges
-  g:hover
-  polygon.canvas-path-end {
-  stroke: rgb(var(--canvas-color));
-  fill: rgb(var(--canvas-color));
+  stroke-width: calc(12px * var(--zoom-multiplier, 1));
 }
 
 /* Edge labels: small ink annotation slips */
 .mod-root .workspace-leaf-content[data-type="canvas"] .canvas-path-label {
   color: var(--smartisan-ink);
   background-color: var(--smartisan-canvas-card-fill);
-  border: 1px solid rgba(var(--smartisan-canvas-ink), 0.28);
+  border: 1px solid color-mix(in srgb, var(--smartisan-canvas-ink) 28%, transparent);
   border-radius: var(--radius-s);
   box-shadow: var(--shadow-s);
   font-family: var(--font-text-theme);
@@ -3307,27 +3295,27 @@ body .epub-bookshelf-root {
   --weave-bookshelf-card-radius: 9px 12px 10px 11px;
   --weave-bookshelf-card-border-width: 1.5px;
   /* Soft iron-gall wash — readable on paper, not heavy calligraphy. */
-  --weave-bookshelf-card-border-color: rgba(var(--smartisan-canvas-ink), 0.42);
-  --weave-bookshelf-card-border-color-hover: rgba(var(--smartisan-canvas-ink), 0.6);
+  --weave-bookshelf-card-border-color: color-mix(in srgb, var(--smartisan-canvas-ink) 42%, transparent);
+  --weave-bookshelf-card-border-color-hover: color-mix(in srgb, var(--smartisan-canvas-ink) 60%, transparent);
   --weave-bookshelf-card-border-color-continue: color-mix(
     in srgb,
     var(--smartisan-accent, var(--interactive-accent)) 36%,
-    rgba(var(--smartisan-canvas-ink), 0.5)
+    color-mix(in srgb, var(--smartisan-canvas-ink) 50%, transparent)
   );
   --weave-bookshelf-card-shadow:
-    1.5px 1.5px 0 0 rgba(var(--smartisan-canvas-ink), 0.16),
+    1.5px 1.5px 0 0 color-mix(in srgb, var(--smartisan-canvas-ink) 16%, transparent),
     0 2px 6px rgba(61, 50, 41, 0.06);
   --weave-bookshelf-card-shadow-hover:
-    2px 2px 0 0 rgba(var(--smartisan-canvas-ink), 0.24),
+    2px 2px 0 0 color-mix(in srgb, var(--smartisan-canvas-ink) 24%, transparent),
     0 4px 10px rgba(61, 50, 41, 0.08);
   --weave-bookshelf-grid-card-shadow-hover:
-    2px 2px 0 0 rgba(var(--smartisan-canvas-ink), 0.24),
+    2px 2px 0 0 color-mix(in srgb, var(--smartisan-canvas-ink) 24%, transparent),
     0 6px 14px rgba(61, 50, 41, 0.09);
   --weave-bookshelf-cover-tile-shadow:
-    1.5px 1.5px 0 0 rgba(var(--smartisan-canvas-ink), 0.14),
+    1.5px 1.5px 0 0 color-mix(in srgb, var(--smartisan-canvas-ink) 14%, transparent),
     0 2px 6px rgba(61, 50, 41, 0.06);
   --weave-bookshelf-cover-tile-shadow-hover:
-    2px 2px 0 0 rgba(var(--smartisan-canvas-ink), 0.22),
+    2px 2px 0 0 color-mix(in srgb, var(--smartisan-canvas-ink) 22%, transparent),
     0 6px 14px rgba(61, 50, 41, 0.09);
 }
 
@@ -3372,22 +3360,22 @@ body .epub-bookshelf-root .epub-book-cover-tile.is-continue-reading {
 
 .theme-dark body .epub-bookshelf-root,
 body.theme-dark .epub-bookshelf-root {
-  --weave-bookshelf-card-border-color: rgba(var(--smartisan-canvas-ink), 0.38);
-  --weave-bookshelf-card-border-color-hover: rgba(var(--smartisan-canvas-ink), 0.55);
+  --weave-bookshelf-card-border-color: color-mix(in srgb, var(--smartisan-canvas-ink) 38%, transparent);
+  --weave-bookshelf-card-border-color-hover: color-mix(in srgb, var(--smartisan-canvas-ink) 55%, transparent);
   --weave-bookshelf-card-shadow:
-    1.5px 1.5px 0 0 rgba(var(--smartisan-canvas-ink), 0.14),
+    1.5px 1.5px 0 0 color-mix(in srgb, var(--smartisan-canvas-ink) 14%, transparent),
     0 2px 8px rgba(0, 0, 0, 0.18);
   --weave-bookshelf-card-shadow-hover:
-    2px 2px 0 0 rgba(var(--smartisan-canvas-ink), 0.22),
+    2px 2px 0 0 color-mix(in srgb, var(--smartisan-canvas-ink) 22%, transparent),
     0 4px 12px rgba(0, 0, 0, 0.22);
   --weave-bookshelf-grid-card-shadow-hover:
-    2px 2px 0 0 rgba(var(--smartisan-canvas-ink), 0.22),
+    2px 2px 0 0 color-mix(in srgb, var(--smartisan-canvas-ink) 22%, transparent),
     0 6px 16px rgba(0, 0, 0, 0.24);
   --weave-bookshelf-cover-tile-shadow:
-    1.5px 1.5px 0 0 rgba(var(--smartisan-canvas-ink), 0.12),
+    1.5px 1.5px 0 0 color-mix(in srgb, var(--smartisan-canvas-ink) 12%, transparent),
     0 2px 8px rgba(0, 0, 0, 0.18);
   --weave-bookshelf-cover-tile-shadow-hover:
-    2px 2px 0 0 rgba(var(--smartisan-canvas-ink), 0.2),
+    2px 2px 0 0 color-mix(in srgb, var(--smartisan-canvas-ink) 20%, transparent),
     0 6px 16px rgba(0, 0, 0, 0.22);
 }
 
