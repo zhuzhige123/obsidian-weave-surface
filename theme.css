@@ -1838,7 +1838,7 @@ body .workspace-split.mod-right-split .workspace-sidedock-vault-profile .clickab
 }
 
 .mod-root
-  .workspace-leaf-content:not([data-type="graph"]):not([data-type="localgraph"]):not([data-type="canvas"])
+  .workspace-leaf-content:not([data-type="graph"]):not([data-type="localgraph"]):not([data-type="canvas"]):not([data-type="weave-epub-reader"]):not([data-type="weave-epub-reader-standalone"])
   .view-content {
   --background-primary: transparent;
   --background-primary-alt: transparent;
@@ -2486,6 +2486,26 @@ input.prompt-input:focus-visible {
   background-color: var(--background-modifier-hover);
 }
 
+/*
+ * Mobile official list menu (+ / actions): keep item gaps, but paint the
+ * menu shell the same solid fill as each .menu-item so the darker “底色间隙”
+ * between keys disappears (gap geometry unchanged).
+ */
+body.is-mobile .menu {
+  background-color: var(--smartisan-paper-fill);
+  background-image: none;
+}
+
+body.is-mobile .menu .menu-item {
+  background-color: var(--smartisan-paper-fill);
+}
+
+body.is-mobile .menu .menu-item:active,
+body.is-mobile .menu .menu-item.selected,
+body.is-mobile .menu .menu-item.is-selected {
+  background-color: var(--background-modifier-hover);
+}
+
 /* Settings */
 .vertical-tab-header {
   background: var(--background-secondary);
@@ -3009,24 +3029,674 @@ button {
   background-color: transparent;
 }
 
-/* ========== Mobile adjustments ========== */
+/* ========== Mobile baseline ==========
+ * Canonical: mobile-layout-prototype.html (confirmed with maintainer).
+ *
+ * A) MD editor / most views — official float chrome:
+ *    - Paper card: inset from screen edges + 4-corner radius (red box).
+ *    - Top bar floats OVER paper, but below status bar (never into it).
+ *    - Bottom bar + keyboard float OVER paper (do not push / shrink paper).
+ *
+ * B) Weave EPUB reader — different logic:
+ *    - Book body sits BETWEEN top bar and bottom bar (no text under header).
+ *    data-type: weave-epub-reader | weave-epub-reader-standalone
+ *
+ * Audit fixes vs prior revisions:
+ * - Desktop joined paper (header fill + top-only radius) must be cleared on mobile.
+ * - Zeroing paper-* insets alone removed top/bottom desk gaps → content hit status bar.
+ * - Do not force position:relative on MD header (breaks official float).
+ * - Do not add keyboard padding that shoves MD/epub paper upward.
+ */
+body.is-mobile {
+  --smartisan-wood-texture: none;
+  --smartisan-paper-suede-texture: none;
+  --smartisan-paper-texture: none;
+  --smartisan-paper-surface: none;
+  --smartisan-editor-desk-surface: none;
+  --smartisan-wood-bg: var(--smartisan-editor-desk-solid);
+
+  --smartisan-dock-inset: 10px;
+  /* Overridden on .is-phone to match prototype equal gap */
+  --smartisan-mobile-edge-seam: var(--smartisan-dock-inset);
+  --smartisan-mobile-bar-gap: 10px;
+  --smartisan-paper-radius: var(--radius-l);
+  /* Neutralize desktop vault-sized bottom inset; mobile sets padding explicitly */
+  --smartisan-paper-top-inset: 0px;
+  --smartisan-paper-inline-inset: 0px;
+  --smartisan-paper-bottom-inset: 0px;
+  --smartisan-side-paper-bottom-no-vault: var(--smartisan-dock-inset);
+  --smartisan-paper-lift-shadow:
+    0 4px 14px rgba(30, 20, 12, 0.16),
+    0 1px 4px rgba(30, 20, 12, 0.1);
+  --vault-profile-order: 0;
+}
+
+body.is-phone {
+  --nav-item-parent-padding: var(--size-4-2) var(--size-4-2) var(--size-4-2) var(--size-4-8);
+}
+
+body.is-mobile,
+body.is-mobile .app-container {
+  background: var(--smartisan-editor-desk-solid);
+  background-attachment: scroll;
+}
+
+body.is-mobile .workspace-ribbon.mod-left,
+body.is-mobile .workspace-ribbon.mod-right,
+body.is-mobile .side-dock-ribbon,
+body.is-mobile .workspace-split.mod-left-split,
+body.is-mobile .workspace-split.mod-right-split,
+body.is-mobile .workspace-split.mod-left-split .workspace-tabs,
+body.is-mobile .workspace-split.mod-right-split .workspace-tabs,
+body.is-mobile .titlebar,
+body.is-mobile .workspace-tabs.mod-top,
+body.is-mobile .workspace-tab-header-container,
+body.is-mobile .status-bar,
+body.is-mobile .titlebar-button-container.mod-left,
+body.is-mobile .titlebar-button-container.mod-right {
+  background-color: var(--smartisan-editor-desk-solid);
+  background-image: none;
+  background-attachment: scroll;
+}
+
+/* ---- A) Mobile layout split ----
+ * A1) data-type="markdown" ONLY — prototype float chrome:
+ *     paper pinned to screen; top/bottom bars + keyboard float OVER body text.
+ * A2) All other views (Weave Deck, Canvas, plugins, …):
+ *     header stays in normal flow ABOVE the paper — never overlaps content.
+ *     (Padding alone is not enough: many plugins absolute-fill .view-content.)
+ *
+ * Safe-area: use var(--safe-area-inset-*), not env() (often 0 on Capacitor).
+ * Device bottom = safe-bottom − keyboard-height.
+ */
+body.is-mobile.is-phone,
+body.is-phone {
+  --smartisan-device-safe-top: var(--safe-area-inset-top, 0px);
+  --smartisan-device-safe-bottom: max(
+    0px,
+    calc(var(--safe-area-inset-bottom, 0px) - var(--keyboard-height, 0px))
+  );
+  --smartisan-mobile-edge-seam: var(--smartisan-dock-inset);
+  height: 100%;
+  max-height: none;
+}
+
+body.is-mobile.is-phone .app-container,
+body.is-phone .app-container,
+html[style*="--keyboard-height"] body.is-phone .app-container,
+html[style*="--keyboard-height"] body.is-mobile.is-phone .app-container {
+  max-height: none !important;
+  height: 100% !important;
+  height: 100dvh !important;
+  min-height: 100% !important;
+  min-height: 100dvh !important;
+}
+
+body.is-mobile.is-phone .horizontal-main-container,
+body.is-mobile.is-phone .workspace,
+body.is-mobile.is-phone .workspace .mod-root,
+body.is-mobile.is-phone .mod-root .workspace-split,
+body.is-mobile.is-phone .mod-root .workspace-tabs,
+body.is-mobile.is-phone .mod-root .workspace-tab-container,
+body.is-mobile.is-phone .mod-root .workspace-leaf {
+  height: 100%;
+  min-height: 0;
+}
+
+/* Shared leaf desk chrome (all non-epub / non-graph) */
 body.is-mobile
   .mod-root
-  .workspace-leaf-content:not([data-type="graph"]):not([data-type="localgraph"]) {
-  --smartisan-paper-top-inset: var(--smartisan-dock-inset);
-  --smartisan-paper-inline-inset: var(--smartisan-dock-inset);
-  --smartisan-paper-bottom-inset: var(--smartisan-dock-inset);
-  padding-top: var(--smartisan-paper-top-inset);
-  padding-inline: var(--smartisan-paper-inline-inset);
-  padding-bottom: var(--smartisan-paper-bottom-inset);
+  .workspace-leaf-content:not([data-type="graph"]):not([data-type="localgraph"]):not([data-type="weave-epub-reader"]):not([data-type="weave-epub-reader-standalone"]) {
+  position: relative;
+  box-sizing: border-box;
+  padding: 0 !important;
+  background-color: var(--smartisan-editor-desk-solid);
+  background-image: none;
+  background-attachment: scroll;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* ========== A2) Non-MD views — header ABOVE paper (no overlap) ========== */
+
+body.is-mobile
+  .mod-root
+  .workspace-leaf-content:not([data-type="markdown"]):not([data-type="graph"]):not([data-type="localgraph"]):not([data-type="weave-epub-reader"]):not([data-type="weave-epub-reader-standalone"]) {
+  display: flex;
+  flex-direction: column;
+  padding-top: var(--safe-area-inset-top, 0px) !important;
+  padding-inline: var(--smartisan-dock-inset) !important;
+  padding-bottom: calc(
+    var(--navbar-height, 52px) +
+      max(0px, calc(var(--safe-area-inset-bottom, 0px) - var(--keyboard-height, 0px))) +
+      4px
+  ) !important;
 }
 
 body.is-mobile
   .mod-root
-  .workspace-leaf-content:not([data-type="graph"]):not([data-type="localgraph"])
-  .view-content {
+  .workspace-leaf-content:not([data-type="markdown"]):not([data-type="graph"]):not([data-type="localgraph"]):not([data-type="weave-epub-reader"]):not([data-type="weave-epub-reader-standalone"])
+  .view-header {
+  position: relative !important;
+  top: auto !important;
+  left: auto !important;
+  right: auto !important;
+  bottom: auto !important;
+  flex: 0 0 auto;
+  width: auto;
+  max-width: none;
   margin: 0;
+  border: none !important;
+  border-radius: 0 !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  box-shadow: none !important;
+  color: var(--text-normal);
+  z-index: 2;
+}
+
+body.is-mobile
+  .mod-root
+  .workspace-leaf-content:not([data-type="markdown"]):not([data-type="graph"]):not([data-type="localgraph"]):not([data-type="weave-epub-reader"]):not([data-type="weave-epub-reader-standalone"])
+  .view-header
+  .view-header-title-container,
+body.is-mobile
+  .mod-root
+  .workspace-leaf-content:not([data-type="markdown"]):not([data-type="graph"]):not([data-type="localgraph"]):not([data-type="weave-epub-reader"]):not([data-type="weave-epub-reader-standalone"])
+  .view-header
+  .view-header-nav-buttons,
+body.is-mobile
+  .mod-root
+  .workspace-leaf-content:not([data-type="markdown"]):not([data-type="graph"]):not([data-type="localgraph"]):not([data-type="weave-epub-reader"]):not([data-type="weave-epub-reader-standalone"])
+  .view-header
+  .view-actions {
+  background: transparent;
+  background-image: none;
+  box-shadow: none;
+  border: none;
+}
+
+body.is-mobile
+  .mod-root
+  .workspace-leaf-content:not([data-type="markdown"]):not([data-type="graph"]):not([data-type="localgraph"]):not([data-type="weave-epub-reader"]):not([data-type="weave-epub-reader-standalone"])
+  .view-content {
+  position: relative !important;
+  top: auto !important;
+  left: auto !important;
+  right: auto !important;
+  bottom: auto !important;
+  flex: 1 1 auto;
+  min-height: 0;
+  width: auto !important;
+  max-width: none !important;
+  height: auto !important;
+  max-height: none !important;
+  margin: 0 !important;
+  margin-top: 4px !important;
+  box-sizing: border-box;
+  display: flex !important;
+  flex-direction: column;
+  padding: 0 !important;
+  border-radius: var(--smartisan-paper-radius) !important;
+  background-color: var(--smartisan-paper-fill) !important;
+  background-image: none !important;
+  box-shadow: var(--smartisan-paper-lift-shadow);
+  overflow: hidden;
+  z-index: 1;
+}
+
+body.is-mobile
+  .mod-root
+  .workspace-leaf-content:not([data-type="markdown"]):not([data-type="graph"]):not([data-type="localgraph"]):not([data-type="weave-epub-reader"]):not([data-type="weave-epub-reader-standalone"])
+  .view-content
+  > * {
+  flex: 1 1 auto;
+  min-height: 0;
+  max-height: 100%;
+}
+
+/* ========== A1) Markdown ONLY — float chrome over full paper ========== */
+
+body.is-mobile.is-phone
+  .mod-root
+  .workspace-leaf-content[data-type="markdown"]
+  .view-header,
+body.is-mobile
+  .mod-root
+  .workspace-leaf-content[data-type="markdown"]
+  .view-header {
+  position: fixed !important;
+  top: var(--smartisan-device-safe-top, var(--safe-area-inset-top, 0px));
+  left: var(--smartisan-dock-inset);
+  right: var(--smartisan-dock-inset);
+  width: auto;
+  max-width: none;
+  margin: 0;
+  border: none !important;
+  border-bottom: none !important;
+  border-radius: 0 !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  box-shadow: none !important;
+  color: var(--text-normal);
+  z-index: 6;
+}
+
+body.is-mobile
+  .mod-root
+  .workspace-leaf-content[data-type="markdown"]
+  .view-header
+  .view-header-title-container,
+body.is-mobile
+  .mod-root
+  .workspace-leaf-content[data-type="markdown"]
+  .view-header
+  .view-header-nav-buttons,
+body.is-mobile
+  .mod-root
+  .workspace-leaf-content[data-type="markdown"]
+  .view-header
+  .view-actions {
+  background: transparent;
+  background-image: none;
+  box-shadow: none;
+  border: none;
+}
+
+body.is-mobile.is-phone
+  .mod-root
+  .workspace-leaf-content[data-type="markdown"]
+  .view-content {
+  position: fixed !important;
+  top: calc(
+    var(--smartisan-device-safe-top, var(--safe-area-inset-top, 0px)) +
+      var(--smartisan-mobile-edge-seam)
+  );
+  left: var(--smartisan-dock-inset);
+  right: var(--smartisan-dock-inset);
+  bottom: calc(
+    var(--smartisan-device-safe-bottom) + var(--smartisan-mobile-edge-seam)
+  );
+  width: auto !important;
+  max-width: none !important;
+  height: auto !important;
+  max-height: none !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  box-sizing: border-box;
+  display: flex !important;
+  flex-direction: column;
+  padding: 0 !important;
+  border-radius: var(--smartisan-paper-radius) !important;
+  background-color: var(--smartisan-paper-fill) !important;
+  background-image: none !important;
+  background-attachment: scroll;
+  box-shadow: var(--smartisan-paper-lift-shadow);
+  overflow: clip;
+  z-index: 1;
+}
+
+body.is-mobile:not(.is-phone)
+  .mod-root
+  .workspace-leaf-content[data-type="markdown"]
+  .view-content {
+  position: absolute;
+  top: calc(var(--safe-area-inset-top, 0px) + var(--smartisan-dock-inset));
+  left: var(--smartisan-dock-inset);
+  right: var(--smartisan-dock-inset);
+  bottom: calc(
+    max(0px, calc(var(--safe-area-inset-bottom, 0px) - var(--keyboard-height, 0px))) +
+      var(--smartisan-dock-inset)
+  );
+  width: auto;
+  max-width: none;
+  height: auto;
+  margin: 0;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  padding: 0 !important;
+  border-radius: var(--smartisan-paper-radius) !important;
+  background-color: var(--smartisan-paper-fill) !important;
+  background-image: none !important;
+  box-shadow: var(--smartisan-paper-lift-shadow);
+  overflow: clip;
+}
+
+body.is-mobile
+  .mod-root
+  .workspace-leaf-content[data-type="markdown"]
+  .view-content
+  > * {
+  flex: 1 1 auto;
+  min-height: 0;
+  max-height: 100%;
+}
+
+body.is-mobile
+  .mod-root
+  .workspace-leaf-content[data-type="markdown"]
+  .view-content
+  .markdown-source-view,
+body.is-mobile
+  .mod-root
+  .workspace-leaf-content[data-type="markdown"]
+  .view-content
+  .markdown-preview-view,
+body.is-mobile
+  .mod-root
+  .workspace-leaf-content[data-type="markdown"]
+  .view-content
+  .cm-editor {
+  height: 100%;
+  min-height: 0;
+}
+
+body.is-mobile.theme-dark {
+  --smartisan-gilt-frame-shadow-stack:
+    0 0 0 1px var(--smartisan-gilt-frame-outer),
+    inset 0 1px 0 var(--smartisan-gilt-frame-highlight),
+    inset 0 -1px 0 var(--smartisan-gilt-frame-shadow),
+    0 0 8px var(--smartisan-gilt-frame-glow);
+}
+
+body.is-mobile.theme-dark
+  .mod-root
+  .workspace-leaf-content:not([data-type="graph"]):not([data-type="localgraph"]):not([data-type="weave-epub-reader"]):not([data-type="weave-epub-reader-standalone"])
+  .view-header {
+  background-color: transparent !important;
+  background-image: none !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+body.is-mobile.theme-dark
+  .mod-root
+  .workspace-leaf-content:not([data-type="graph"]):not([data-type="localgraph"]):not([data-type="weave-epub-reader"]):not([data-type="weave-epub-reader-standalone"])
+  .view-content {
+  background-color: var(--smartisan-paper-fill) !important;
+  background-image: none !important;
+  border: 1px solid var(--smartisan-gilt-frame-border);
+  box-shadow:
+    0 0 0 1px var(--smartisan-gilt-frame-outer),
+    inset 0 -1px 0 var(--smartisan-gilt-frame-shadow),
+    0 0 8px var(--smartisan-gilt-frame-glow);
+}
+
+/* ---- B) Weave EPUB reader: body between top & bottom chrome ----
+ * Paper: 4-corner radius (not desktop joined top-square card).
+ * Bottom: Obsidian navbar floats; keep only a thin desk seam under the paper.
+ * Shrink plugin --epub-mobile-bottom-* so翻页栏下方不再空出大块未用区.
+ */
+
+body.is-mobile
+  .mod-root
+  .workspace-leaf-content[data-type="weave-epub-reader"],
+body.is-mobile
+  .mod-root
+  .workspace-leaf-content[data-type="weave-epub-reader-standalone"] {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  padding-top: 0;
+  padding-inline: var(--smartisan-dock-inset);
+  /* Thin seam above floating mobile-navbar — do not stack dock + safe + plugin clearance */
+  padding-bottom: calc(
+    var(--navbar-height, 52px) +
+      max(0px, calc(var(--safe-area-inset-bottom, 0px) - var(--keyboard-height, 0px))) +
+      4px
+  );
+  background-color: var(--smartisan-editor-desk-solid);
+  background-image: none;
+  background-attachment: scroll;
+  /* Page-nav sits near paper bottom; navbar clearance is leaf padding, not inner pad */
+  --epub-mobile-bottom-offset: 0px;
+  --epub-mobile-bottom-clearance: var(--epub-toolbar-edge-gap, 6px);
+  --weave-workspace-bottom-offset: 0px;
+}
+
+body.is-mobile
+  .mod-root
+  .workspace-leaf-content[data-type="weave-epub-reader"]
+  .view-header,
+body.is-mobile
+  .mod-root
+  .workspace-leaf-content[data-type="weave-epub-reader-standalone"]
+  .view-header {
+  position: relative !important;
+  top: auto !important;
+  left: auto !important;
+  right: auto !important;
+  bottom: auto !important;
+  transform: none !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  z-index: 6;
+  flex: 0 0 auto;
+  margin: 0;
+  margin-top: var(--safe-area-inset-top, 0px);
+  width: auto;
+  max-width: none;
+  border: none;
+  border-bottom: none;
+  border-radius: 0;
+  background-color: transparent;
+  background-image: none;
+  box-shadow: none;
+  color: var(--text-normal);
+}
+
+body.is-mobile.is-hidden-nav
+  .mod-root
+  .workspace-leaf-content[data-type="weave-epub-reader"]
+  .view-header,
+body.is-mobile.is-hidden-nav
+  .mod-root
+  .workspace-leaf-content[data-type="weave-epub-reader-standalone"]
+  .view-header {
+  transform: none !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+body.is-mobile
+  .mod-root
+  .workspace-leaf-content[data-type="weave-epub-reader"]
+  .view-header
+  .view-header-title-container,
+body.is-mobile
+  .mod-root
+  .workspace-leaf-content[data-type="weave-epub-reader-standalone"]
+  .view-header
+  .view-header-title-container,
+body.is-mobile
+  .mod-root
+  .workspace-leaf-content[data-type="weave-epub-reader"]
+  .view-header
+  .view-header-nav-buttons,
+body.is-mobile
+  .mod-root
+  .workspace-leaf-content[data-type="weave-epub-reader-standalone"]
+  .view-header
+  .view-header-nav-buttons,
+body.is-mobile
+  .mod-root
+  .workspace-leaf-content[data-type="weave-epub-reader"]
+  .view-header
+  .view-actions,
+body.is-mobile
+  .mod-root
+  .workspace-leaf-content[data-type="weave-epub-reader-standalone"]
+  .view-header
+  .view-actions {
+  background: transparent;
+  background-image: none;
+  box-shadow: none;
+  border: none;
+}
+
+body.is-mobile
+  .mod-root
+  .workspace-leaf-content[data-type="weave-epub-reader"]
+  .view-content,
+body.is-mobile
+  .mod-root
+  .workspace-leaf-content[data-type="weave-epub-reader-standalone"]
+  .view-content {
+  flex: 1 1 auto;
+  min-height: 0;
+  margin-top: var(--smartisan-mobile-bar-gap);
+  /* No extra desk band under paper — leaf padding-bottom already clears navbar */
+  margin-bottom: 0;
+  margin-inline: 0;
+  width: auto;
+  max-width: none;
   padding: 0;
+  box-sizing: border-box;
+  /* Beat desktop joined-card rule (bottom-only radius) — 四角都要圆 */
+  border-radius: var(--smartisan-paper-radius) !important;
+  background-color: var(--smartisan-paper-fill) !important;
+  background-image: none !important;
+  background-attachment: scroll;
+  box-shadow: var(--smartisan-paper-lift-shadow);
+  overflow: hidden;
+}
+
+/* Inner reader shell inherits the same 4-corner clip */
+body.is-mobile
+  .mod-root
+  .workspace-leaf-content[data-type="weave-epub-reader"]
+  .view-content
+  .epub-reader-root,
+body.is-mobile
+  .mod-root
+  .workspace-leaf-content[data-type="weave-epub-reader-standalone"]
+  .view-content
+  .epub-reader-root,
+body.is-mobile
+  .mod-root
+  .workspace-leaf-content[data-type="weave-epub-reader"]
+  .view-content
+  .weave-epub-view-shell,
+body.is-mobile
+  .mod-root
+  .workspace-leaf-content[data-type="weave-epub-reader-standalone"]
+  .view-content
+  .weave-epub-view-shell {
+  border-radius: inherit;
+  overflow: hidden;
+}
+
+/* Collapse plugin bottom-nav dead pad (clearance now on leaf, not inside paper) */
+body.is-mobile
+  .mod-root
+  .workspace-leaf-content[data-type="weave-epub-reader"]
+  .epub-bottom-nav-slot,
+body.is-mobile
+  .mod-root
+  .workspace-leaf-content[data-type="weave-epub-reader-standalone"]
+  .epub-bottom-nav-slot {
+  padding-bottom: var(--epub-toolbar-edge-gap, 6px);
+}
+
+body.is-mobile.theme-dark
+  .mod-root
+  .workspace-leaf-content[data-type="weave-epub-reader"]
+  .view-header,
+body.is-mobile.theme-dark
+  .mod-root
+  .workspace-leaf-content[data-type="weave-epub-reader-standalone"]
+  .view-header {
+  background-color: transparent;
+  background-image: none;
+  border: none;
+  box-shadow: none;
+}
+
+body.is-mobile.theme-dark
+  .mod-root
+  .workspace-leaf-content[data-type="weave-epub-reader"]
+  .view-content,
+body.is-mobile.theme-dark
+  .mod-root
+  .workspace-leaf-content[data-type="weave-epub-reader-standalone"]
+  .view-content {
+  background-color: var(--smartisan-paper-fill) !important;
+  background-image: none !important;
+  border: 1px solid var(--smartisan-gilt-frame-border);
+  border-radius: var(--smartisan-paper-radius) !important;
+  box-shadow:
+    0 0 0 1px var(--smartisan-gilt-frame-outer),
+    inset 0 -1px 0 var(--smartisan-gilt-frame-shadow),
+    0 0 8px var(--smartisan-gilt-frame-glow);
+}
+
+/* Side / drawer paper */
+body.is-mobile .workspace-split.mod-left-split .workspace-tab-container,
+body.is-mobile .workspace-split.mod-right-split .workspace-tab-container,
+body.is-mobile .workspace-drawer .workspace-tab-container {
+  margin: 0 var(--smartisan-dock-inset) var(--smartisan-dock-inset);
+  border-radius: var(--smartisan-paper-radius);
+  background-image: none;
+  background-attachment: scroll;
+}
+
+/*
+ * Keyboard: float over content — do not shrink MD/epub paper for --keyboard-height.
+ * Only hide drawer chrome while the IME is open (Composer pattern).
+ * Keep mobile navbar above the fixed paper so it still floats over content.
+ */
+html[style*="--keyboard-height"]:not([style*="--keyboard-height: 0px"]):not([style*="--keyboard-height:0px"])
+  body.is-phone
+  .workspace-drawer-tab-options,
+html[style*="--keyboard-height"]:not([style*="--keyboard-height: 0px"]):not([style*="--keyboard-height:0px"])
+  body.is-phone
+  .workspace-drawer-header {
+  display: none !important;
+}
+
+body.is-mobile.is-phone .mobile-navbar {
+  z-index: 8;
+}
+
+.is-mobile.is-floating-nav.is-phone
+  .workspace-drawer
+  .workspace-leaf-content
+  .nav-header
+  ~ div:last-child {
+  padding-bottom: var(--size-4-2);
+}
+
+.is-phone .workspace-drawer .nav-buttons-container {
+  position: initial;
+}
+
+.is-phone .workspace-drawer-tab-select .workspace-tab-header-inner {
+  background-color: var(--background-modifier-hover);
+  color: var(--text-muted);
+}
+
+body.is-mobile .nav-file-title,
+body.is-mobile .nav-folder-title,
+body.is-mobile .tree-item-self {
+  padding-top: 6px;
+  padding-bottom: 6px;
+}
+
+.is-mobile .metadata-properties {
+  padding-bottom: 8px;
+}
+
+.is-mobile .nav-files-container,
+.is-mobile .outline,
+.is-mobile .bookmark-container,
+.is-mobile .tag-container,
+.is-mobile .search-results,
+.is-mobile .backlink-pane,
+.is-mobile .outgoing-link-pane {
+  padding-bottom: max(var(--safe-area-inset-bottom, 0px), 10px);
 }
 
 
