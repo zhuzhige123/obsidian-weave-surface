@@ -1267,15 +1267,18 @@ body .workspace-ribbon.mod-left:before,
 /* Dark paper blend comes from --smartisan-paper-bg-blend on .theme-dark */
 
 /*
- * Dark mode side docks: dissolve the floating paper card so the panel
- * matches surrounding desk chrome. Prefer transparent (show parent desk)
- * over opacity — opacity would also fade file names and icons.
- * Gilt frame marks the content area on dark wood.
+ * Dark mode side docks: keep the same paper fill as the main editor card.
+ * Do NOT dissolve to desk — that made dock/editor backgrounds diverge when
+ * Style Settings desk materials change (desk shows through transparent shells).
+ * Gilt frame still marks the content area on dark wood.
  */
 .theme-dark .workspace-split.mod-left-split .workspace-tab-container,
 .theme-dark .workspace-split.mod-right-split .workspace-tab-container {
-  background-color: transparent;
-  background-image: none;
+  background-color: var(--smartisan-paper-fill);
+  background-image: var(--smartisan-paper-surface);
+  background-size: var(--smartisan-paper-bg-size);
+  background-blend-mode: var(--smartisan-paper-bg-blend);
+  background-attachment: fixed;
   border: 1px solid var(--smartisan-gilt-frame-border);
   box-shadow: var(--smartisan-gilt-frame-shadow-stack);
 }
@@ -1860,8 +1863,10 @@ body .workspace-split.mod-right-split .workspace-sidedock-vault-profile .clickab
 }
 
 /*
- * Dark mode main content card: same gilt frame + transparent shell as side docks.
- * Header + content share one frame; graph stays on editor desk (no extra wood layer).
+ * Dark mode main content card: same paper fill as side docks (not desk).
+ * Transparent shells previously let Style Settings desk materials bleed into
+ * the editor while docks could still read as paper — mismatched backgrounds.
+ * Header + content share one gilt-framed paper; graph stays on editor desk.
  */
 .theme-dark
   .mod-root
@@ -1871,8 +1876,11 @@ body .workspace-split.mod-right-split .workspace-sidedock-vault-profile .clickab
   .mod-root
   .workspace-leaf-content:not([data-type="graph"]):not([data-type="localgraph"])
   .view-content {
-  background-color: transparent;
-  background-image: none;
+  background-color: var(--smartisan-paper-fill);
+  background-image: var(--smartisan-paper-surface);
+  background-size: var(--smartisan-paper-bg-size);
+  background-blend-mode: var(--smartisan-paper-bg-blend);
+  background-attachment: fixed;
 }
 
 .theme-dark
