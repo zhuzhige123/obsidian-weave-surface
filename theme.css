@@ -55,6 +55,24 @@ settings:
             -
                 label: 软木板
                 value: smartisan-desk-cork
+    -
+        id: smartisan-dock-heading
+        title: 侧边栏
+        type: heading
+        level: 2
+        collapsed: false
+    -
+        id: smartisan-dock-desk-bleed
+        title: 侧栏内容透出桌面
+        description: 开启后，左右侧边栏（及移动端抽屉）内容区背景透明，与周边桌面材质一致；关闭时保持纸卡底色。
+        type: class-toggle
+        default: false
+    -
+        id: smartisan-editor-desk-bleed
+        title: 主内容区透出桌面
+        description: 开启后，中间主编辑区（纸卡）背景透明，透出桌面材质；关闭时保持纸卡底色。与「侧栏内容透出桌面」相互独立。
+        type: class-toggle
+        default: false
 
 */
 
@@ -1267,10 +1285,8 @@ body .workspace-ribbon.mod-left:before,
 /* Dark paper blend comes from --smartisan-paper-bg-blend on .theme-dark */
 
 /*
- * Dark mode side docks: keep the same paper fill as the main editor card.
- * Do NOT dissolve to desk — that made dock/editor backgrounds diverge when
- * Style Settings desk materials change (desk shows through transparent shells).
- * Gilt frame still marks the content area on dark wood.
+ * Dark mode side docks: same paper fill as the main editor card by default.
+ * Optional: Style Settings →「侧栏内容透出桌面」(body.smartisan-dock-desk-bleed).
  */
 .theme-dark .workspace-split.mod-left-split .workspace-tab-container,
 .theme-dark .workspace-split.mod-right-split .workspace-tab-container {
@@ -1281,6 +1297,159 @@ body .workspace-ribbon.mod-left:before,
   background-attachment: fixed;
   border: 1px solid var(--smartisan-gilt-frame-border);
   box-shadow: var(--smartisan-gilt-frame-shadow-stack);
+}
+
+/*
+ * Style Settings: side-dock content shows desk material (transparent shell).
+ * Applies to light + dark; desktop splits and mobile drawers.
+ */
+body.smartisan-dock-desk-bleed .workspace-split.mod-left-split .workspace-tab-container,
+body.smartisan-dock-desk-bleed .workspace-split.mod-right-split .workspace-tab-container,
+body.smartisan-dock-desk-bleed.is-mobile .workspace-drawer .workspace-tab-container {
+  background-color: transparent !important;
+  background-image: none !important;
+}
+
+body.smartisan-dock-desk-bleed.theme-dark .workspace-split.mod-left-split .workspace-tab-container,
+body.smartisan-dock-desk-bleed.theme-dark .workspace-split.mod-right-split .workspace-tab-container,
+body.smartisan-dock-desk-bleed.theme-dark.is-mobile .workspace-drawer .workspace-tab-container {
+  /* Keep a light gilt edge so the panel is still readable on dark wood */
+  border: 1px solid var(--smartisan-gilt-frame-border);
+  box-shadow: var(--smartisan-gilt-frame-shadow-stack);
+}
+
+body.smartisan-dock-desk-bleed.theme-light .workspace-split.mod-left-split .workspace-tab-container,
+body.smartisan-dock-desk-bleed.theme-light .workspace-split.mod-right-split .workspace-tab-container,
+body.smartisan-dock-desk-bleed.theme-light.is-mobile .workspace-drawer .workspace-tab-container {
+  box-shadow: none;
+}
+
+/*
+ * Style Settings: main editor paper shows desk material (transparent shell).
+ * Independent of smartisan-dock-desk-bleed. Graph stays on desk already.
+ */
+body.smartisan-editor-desk-bleed
+  .mod-root
+  .workspace-leaf-content:not([data-type="graph"]):not([data-type="localgraph"])
+  .view-header,
+body.smartisan-editor-desk-bleed
+  .mod-root
+  .workspace-leaf-content:not([data-type="graph"]):not([data-type="localgraph"])
+  .view-content {
+  background-color: transparent !important;
+  background-image: none !important;
+}
+
+body.smartisan-editor-desk-bleed.theme-dark
+  .mod-root
+  .workspace-leaf-content:not([data-type="graph"]):not([data-type="localgraph"])
+  .view-header {
+  border: 1px solid var(--smartisan-gilt-frame-border);
+  border-bottom: none;
+  box-shadow: inset 0 1px 0 var(--smartisan-gilt-frame-highlight);
+}
+
+body.smartisan-editor-desk-bleed.theme-dark
+  .mod-root
+  .workspace-leaf-content:not([data-type="graph"]):not([data-type="localgraph"])
+  .view-content {
+  border: 1px solid var(--smartisan-gilt-frame-border);
+  border-top: none;
+  box-shadow:
+    0 0 0 1px var(--smartisan-gilt-frame-outer),
+    inset 0 -1px 0 var(--smartisan-gilt-frame-shadow),
+    0 0 14px var(--smartisan-gilt-frame-glow);
+}
+
+body.smartisan-editor-desk-bleed.theme-light
+  .mod-root
+  .workspace-leaf-content:not([data-type="graph"]):not([data-type="localgraph"])
+  .view-header,
+body.smartisan-editor-desk-bleed.theme-light
+  .mod-root
+  .workspace-leaf-content:not([data-type="graph"]):not([data-type="localgraph"])
+  .view-content {
+  box-shadow: none;
+}
+
+/*
+ * Weave EPUB reader: plugin paints its own paper via --background-primary /
+ * --epub-bg-* on .weave-epub-view-shell / .weave-epub-reader-host. Other themes
+ * “auto-adapt” because they only tint those tokens; this theme must clear them
+ * when「主内容区透出桌面」is on, same as MD view-content.
+ */
+body.smartisan-editor-desk-bleed
+  .workspace-leaf-content[data-type="weave-epub-reader"],
+body.smartisan-editor-desk-bleed
+  .workspace-leaf-content[data-type="weave-epub-reader-standalone"] {
+  --background-primary: transparent;
+  --background-primary-alt: transparent;
+  --background-secondary: transparent;
+  --background-secondary-alt: transparent;
+  --epub-bg-app: transparent;
+  --epub-bg-paper: transparent;
+  --epub-bg-glass: transparent;
+  --smartisan-paper-fill: transparent;
+  --smartisan-paper-surface: none;
+}
+
+body.smartisan-editor-desk-bleed
+  .workspace-leaf-content[data-type="weave-epub-reader"]
+  .view-content,
+body.smartisan-editor-desk-bleed
+  .workspace-leaf-content[data-type="weave-epub-reader-standalone"]
+  .view-content,
+body.smartisan-editor-desk-bleed
+  .workspace-leaf-content[data-type="weave-epub-reader"]
+  .weave-epub-view-content,
+body.smartisan-editor-desk-bleed
+  .workspace-leaf-content[data-type="weave-epub-reader-standalone"]
+  .weave-epub-view-content,
+body.smartisan-editor-desk-bleed
+  .workspace-leaf-content[data-type="weave-epub-reader"]
+  .weave-epub-view-shell,
+body.smartisan-editor-desk-bleed
+  .workspace-leaf-content[data-type="weave-epub-reader-standalone"]
+  .weave-epub-view-shell,
+body.smartisan-editor-desk-bleed
+  .workspace-leaf-content[data-type="weave-epub-reader"]
+  .epub-reader-root,
+body.smartisan-editor-desk-bleed
+  .workspace-leaf-content[data-type="weave-epub-reader-standalone"]
+  .epub-reader-root,
+body.smartisan-editor-desk-bleed
+  .workspace-leaf-content[data-type="weave-epub-reader"]
+  .weave-epub-reader-host,
+body.smartisan-editor-desk-bleed
+  .workspace-leaf-content[data-type="weave-epub-reader-standalone"]
+  .weave-epub-reader-host,
+body.smartisan-editor-desk-bleed
+  .workspace-leaf-content[data-type="weave-epub-reader"]
+  .epub-reader-viewport,
+body.smartisan-editor-desk-bleed
+  .workspace-leaf-content[data-type="weave-epub-reader-standalone"]
+  .epub-reader-viewport,
+body.smartisan-editor-desk-bleed
+  .workspace-leaf-content[data-type="weave-epub-reader"]
+  .epub-bottom-nav-slot,
+body.smartisan-editor-desk-bleed
+  .workspace-leaf-content[data-type="weave-epub-reader-standalone"]
+  .epub-bottom-nav-slot {
+  background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
+}
+
+body.smartisan-editor-desk-bleed
+  .workspace-leaf-content[data-type="weave-epub-reader"]
+  .epub-viewer-container
+  > .weave-epub-reader-host::part(container),
+body.smartisan-editor-desk-bleed
+  .workspace-leaf-content[data-type="weave-epub-reader-standalone"]
+  .epub-viewer-container
+  > .weave-epub-reader-host::part(container) {
+  background: transparent !important;
+  background-color: transparent !important;
 }
 
 .workspace-split.mod-left-split .workspace-leaf-content,
